@@ -1,5 +1,5 @@
 # IJAL-interlinear
-render interactive webpage from audio and ELAN markup: a proposal for David Beck
+A python package render interactive webpage from audio and ELAN markup: a proposal for David Beck, based on EtoHTML.py
 
 This skeletal python package demonstrates one possible way to refactor EtoHTML.py, with these goals:
   - use traditional Python package module directory structure
