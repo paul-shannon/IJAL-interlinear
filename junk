@@ -1,0 +1,11 @@
+git add LICENSE
+git add MANIFEST.in
+git add Makefile
+git add README.rst
+git add docs/
+git add iiGenerator/
+git add junk
+git add requirements.txt
+git add setup.py
+git add testData/
+git add tests/
