@@ -12,9 +12,6 @@ class Text:
 #      this tierID points us to all of the subordinate tiers:
 #    text1.doc.findall(pattern)  #     [<Element 'TIER' at 0x10a27f4a8>, <Element 'TIER' at 0x10a289c28>]
 
->>> text1.doc.find(pattern).attrib
-{'LI
-
    def __init__(self, filename):
      self.filename = filename
      self.doc = etree.parse(filename)
