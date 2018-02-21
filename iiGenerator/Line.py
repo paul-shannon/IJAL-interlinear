@@ -32,8 +32,11 @@ class Line:
    def getOriginalText(self):
      return(self.tbl.ix[0, "TEXT"])
 
-   def getHtml(self):
+   def toHtml(self):
       tbl = self.getTable()
+      # prepend <table id=""> <tbody> then for each row in tbl.shape(0)
+      # dict = tbl.to_dict(orient='records')[row]
+      # tierToHtml(dict)
       return("<h4> %s </h4>" % self.getOriginalText())
 
    def tmp(self):

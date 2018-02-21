@@ -66,6 +66,48 @@ def test_getHTML():
    print("%2d) %s" % (0, lineHtml))
 
 #----------------------------------------------------------------------------------------------------
+# david beck email (28 jan 2018)
+#
+#  create HTML for up to six lines (e.g., a line in a practical
+#  orthography, a line in phonetic transcription, a parsing line, a
+#  glossing line, a free translation in Language 1, and a free
+#  transltion in Language 2). The parsing line and glossing line have
+#  some other constraints on them (the annotations on these two lines
+#  have to match perfectly and exhaustively).
+#
+#  suggesting these tier types:
+#    1) text
+#    2) phonemes
+#    3) parsing
+#    4) glossing
+#    5) free translation language 1
+#    6) free translation language 2
+#
+#  this functions's first job is to idenitfy the tier type, using iformal rules
+def tierToHtml(tier):
+
+  keys = list(tier.keys())
+  assert(keys==['ANNOTATION_ID', 'LINGUISTIC_TYPE_REF', 'START', 'END', 'TEXT', 'ANNOTATION_REF',
+                'TIME_SLOT_REF1', 'TIME_SLOT_REF2', 'PARENT_REF', 'TIER_ID'])
+
+     # 4 types thus far: 0     default-lt, phonemic, translation, translation
+     # are there any tiers with divided text, recognized by tabs and a parent/child
+     # relationship, childTier.ANNOTATION_REF = parentTier.ANNOTATION_ID
+
+tierRefType = tier['LINGUISTIC_TYPE_REF']
+startTime = tier['START']
+rawText = tier['TEXT']
+hasSeparatedWords = rawText.find("\t") >= 0
+
+tierType = "unknown"
+if(tierRefType == "default-lt" and startTime >= 0):
+   tierType = "text"
+else if(tierRefType == "phonemic" and hasSeparatedWords):
+   tierType = "phonemes"
+else if(tierTypeRef
+
+
+#----------------------------------------------------------------------------------------------------
 pd.set_option('display.width', 500)
 
 if __name__ == '__main__':
