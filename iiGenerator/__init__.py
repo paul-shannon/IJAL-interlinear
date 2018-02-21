@@ -1,2 +1,0 @@
-from .Tier import Tier
-

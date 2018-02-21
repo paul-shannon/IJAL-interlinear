@@ -29,6 +29,13 @@ class Line:
    def getTable(self):
      return(self.tbl)
 
+   def getOriginalText(self):
+     return(self.tbl.ix[0, "TEXT"])
+
+   def getHtml(self):
+      tbl = self.getTable()
+      return("<h4> %s </h4>" % self.getOriginalText())
+
    def tmp(self):
                # should be exactly one alignable tier, so it is safe to get the first one found
       alignableTierType_id = self.doc.find("LINGUISTIC_TYPE[@TIME_ALIGNABLE='true']").attrib["LINGUISTIC_TYPE_ID"]
@@ -58,7 +65,6 @@ def findChildren(doc, rootElement):
          elementsToDo.extend(childElements)
 
    return(elementsCompleted)
-
 
 #------------------------------------------------------------------------------------------------------------------------
 def buildTable(doc, lineElements):

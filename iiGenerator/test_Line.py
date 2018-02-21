@@ -7,6 +7,7 @@ def runTests():
    test_daylight_0()
    test_monkey_0()
    test_monkey_all()
+   test_getHTML()
 
 #----------------------------------------------------------------------------------------------------
 def test_daylight_0():
@@ -46,8 +47,23 @@ def test_monkey_all():
    doc = etree.parse(filename)
    lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
    for i in range(lineCount):
-      line = Line(doc, i)
-      print("%2d) %s" % (i, line.getTable().ix[0, "TEXT"]))
+     line = Line(doc, i)
+     lineText = line.getOriginalText()
+     print("%2d) %s" % (i, lineText))
+
+#----------------------------------------------------------------------------------------------------
+def test_getHTML():
+
+   print("--- test_monkey_all")
+
+   filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+   doc = etree.parse(filename)
+   lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
+   line = Line(doc, 0)
+   lineText = line.getOriginalText()
+   print("%2d) %s" % (0, lineText))
+   lineHtml = line.getHtml()
+   print("%2d) %s" % (0, lineHtml))
 
 #----------------------------------------------------------------------------------------------------
 pd.set_option('display.width', 500)
