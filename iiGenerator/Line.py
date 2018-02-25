@@ -29,15 +29,53 @@ class Line:
    def getTable(self):
      return(self.tbl)
 
-   def getOriginalText(self):
+   def classifyTier(self, tierNumber):
+     assert(tierNumber < self.getTable().shape[0])
+     tierInfo = self.getTable().ix[tierNumber].to_dict()
+     tierType = tierInfo['LINGUISTIC_TYPE_REF']
+     hasTimes = tierInfo['START'] >= 0 and tierInfo['END'] >= 0
+     hasText = tierInfo['TEXT'] != None
+     hasTokenizedText = False
+     if(hasText):
+        hasTokenizedText = tierInfo['TEXT'].find("\t") > 0
+     if((tierType == "default-lt") and (hasTimes)):
+        return("spokenText")
+     if(tierType == "phonemic" and hasTokenizedText):
+        return("tokenizedPhonemes")
+     if(tierType == "translation" and hasTokenizedText):
+        return("tokenizedPhonemesTranslated")
+     if(tierType == "translation" and hasText and not hasTokenizedText):
+        return("freeTranslation")
+     return ("unrecognized")
+
+
+   def getSpokenText(self):
      return(self.tbl.ix[0, "TEXT"])
+
+   def spokenTextToHtml(obj):
+
+      """
+        emulate this form:
+          <tr class="CuPED-annotation-line CuPED-annotation-tier-0">
+            <td rowspan="4" width="25px">1)<br />
+              <img class="alignnone size-full wp-image-481"
+                   src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"
+	           alt="speaker" width="25" height="25"  onclick="playAnnotation(0.388, 8.895)"/>
+               </td>
+            <td class="CuPED-annotation-text" colspan="2">
+               <i>Por ejemplo el, como se llama, el mono,</i>
+               </td>
+          </tr>
+      """
+      html = ""
+
 
    def toHtml(self):
       tbl = self.getTable()
       # prepend <table id=""> <tbody> then for each row in tbl.shape(0)
       # dict = tbl.to_dict(orient='records')[row]
       # tierToHtml(dict)
-      return("<h4> %s </h4>" % self.getOriginalText())
+      return("<h4> %s </h4>" % self.getSpokenText())
 
    def tmp(self):
                # should be exactly one alignable tier, so it is safe to get the first one found

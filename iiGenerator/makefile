@@ -1,3 +1,4 @@
 testLine:
-	python test_Line.py
+	python -i test_Line.py
+
 

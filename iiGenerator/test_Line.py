@@ -7,6 +7,7 @@ def runTests():
    test_daylight_0()
    test_monkey_0()
    test_monkey_all()
+   test_classifyTier()
    #test_getHTML()
 
 #----------------------------------------------------------------------------------------------------
@@ -54,11 +55,41 @@ def test_monkey_all(verbose=False):
      tbl = line.getTable()
      tierTypes = list(tbl.ix[:, "LINGUISTIC_TYPE_REF"])
      assert(tierTypes == ['default-lt', 'phonemic', 'translation', 'translation'])
-     lineText = line.getOriginalText()
+     lineText = line.getSpokenText()
      assert(len(lineText) >= 10)   # empirically derived.  lines have betwee 10 and 61 characters
      assert(len(lineText) < 100)   # empirically derived.  lines have betwee 10 and 61 characters
      if(verbose):
         print("%2d) %s" % (i, lineText))
+
+#----------------------------------------------------------------------------------------------------
+# ijal eaf lines have tiers of six types, of which all but the first seem to be optional
+#   1) default-lt.  "default linguistic type" - this contains the spoken TEXT, and non-null start and stop times
+#   2) phonenmic.  optional. the TEXT field is tab-delimited
+#   3) translation/to.language.
+#   4) translation: phonemic GL(oss)
+def test_classifyTier():
+
+   print("--- test_classifyTier")
+
+     # test the usual case: 4 tiers, each with content
+   filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+   doc = etree.parse(filename)
+   line6 = Line(doc, 6)   # in ayapanec, 4 tiers:, default-lt, phonemic with 7 tokens, translation into english, trans by phoneme 7 tokens
+   tierCount = line6.getTable().shape[0]
+   assert(tierCount == 4)
+   assert(line6.classifyTier(0) == "spokenText")
+   assert(line6.classifyTier(1) == "tokenizedPhonemes")
+   assert(line6.classifyTier(2) == "freeTranslation")
+   assert(line6.classifyTier(3) == "tokenizedPhonemesTranslated")
+
+       # now try a degenerate case, from one of the Spanish-only introductory lines
+   line0 = Line(doc, 0)
+   tierCount = line0.getTable().shape[0]
+   assert(tierCount == 4)
+   assert(line0.classifyTier(0) == "spokenText")
+   assert(line0.classifyTier(1) == "unrecognized")
+   assert(line0.classifyTier(2) == "freeTranslation")
+   assert(line0.classifyTier(3) == "unrecognized")
 
 #----------------------------------------------------------------------------------------------------
 def test_getHTML():
@@ -69,7 +100,7 @@ def test_getHTML():
    doc = etree.parse(filename)
    lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
    line = Line(doc, 0)
-   lineText = line.getOriginalText()
+   lineText = line.getSpokenText()
    print("%2d) %s" % (0, lineText))
    lineHtml = line.getHtml()
    print("%2d) %s" % (0, lineHtml))
@@ -125,7 +156,8 @@ if __name__ == '__main__':
 #filename1 = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
 #doc1 = etree.parse(filename0)
 #doc2 = etree.parse(filename1)
-#line0 = Line(doc2, 0)
+#line0 = Line(doc2, 0)   # in spanish, just two non-empty tiers
+#line6 = Line(doc2, 6)   # in ayapanec, 4 tiers:, default-lt, phonemic with 7 tokens, translation into english, trans by phoneme 7 tokens
 # line0 = Line(doc, 0)
 
 
