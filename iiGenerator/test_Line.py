@@ -7,7 +7,7 @@ def runTests():
    test_daylight_0()
    test_monkey_0()
    test_monkey_all()
-   test_getHTML()
+   #test_getHTML()
 
 #----------------------------------------------------------------------------------------------------
 def test_daylight_0():
@@ -17,6 +17,8 @@ def test_daylight_0():
    doc = etree.parse(filename)
    line0 = Line(doc, 0)
    tbl = line0.getTable()
+   tierTypes = list(tbl.ix[:, "LINGUISTIC_TYPE_REF"])
+   assert(tierTypes== ['default-lt', 'translation'])
    assert(tbl.shape == (2, 10))
    assert(list(tbl.ix[0, ["ANNOTATION_ID", "START", "END", "TEXT"]]) ==['a1', 0.0, 768.0, 'dil tu'])
    assert(list(tbl.ix[1, ["ANNOTATION_ID", "TEXT"]]) == ['a332', 'focal'])
@@ -39,17 +41,24 @@ def test_monkey_0():
    assert(list(tbl.ix[:, "LINGUISTIC_TYPE_REF"]) == ["default-lt", "phonemic", "translation", "translation"])
 
 #----------------------------------------------------------------------------------------------------
-def test_monkey_all():
+def test_monkey_all(verbose=False):
 
    print("--- test_monkey_all")
 
    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
    doc = etree.parse(filename)
    lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
+   assert(lineCount == 41)
    for i in range(lineCount):
      line = Line(doc, i)
+     tbl = line.getTable()
+     tierTypes = list(tbl.ix[:, "LINGUISTIC_TYPE_REF"])
+     assert(tierTypes == ['default-lt', 'phonemic', 'translation', 'translation'])
      lineText = line.getOriginalText()
-     print("%2d) %s" % (i, lineText))
+     assert(len(lineText) >= 10)   # empirically derived.  lines have betwee 10 and 61 characters
+     assert(len(lineText) < 100)   # empirically derived.  lines have betwee 10 and 61 characters
+     if(verbose):
+        print("%2d) %s" % (i, lineText))
 
 #----------------------------------------------------------------------------------------------------
 def test_getHTML():
@@ -94,18 +103,17 @@ def tierToHtml(tier):
      # are there any tiers with divided text, recognized by tabs and a parent/child
      # relationship, childTier.ANNOTATION_REF = parentTier.ANNOTATION_ID
 
-tierRefType = tier['LINGUISTIC_TYPE_REF']
-startTime = tier['START']
-rawText = tier['TEXT']
-hasSeparatedWords = rawText.find("\t") >= 0
+  tierRefType = tier['LINGUISTIC_TYPE_REF']
+  startTime = tier['START']
+  rawText = tier['TEXT']
+  hasSeparatedWords = rawText.find("\t") >= 0
 
-tierType = "unknown"
-if(tierRefType == "default-lt" and startTime >= 0):
-   tierType = "text"
-else if(tierRefType == "phonemic" and hasSeparatedWords):
-   tierType = "phonemes"
-else if(tierTypeRef
-
+  tierType = "unknown"
+  if(tierRefType == "default-lt" and startTime >= 0):
+     tierType = "text"
+  #elseif(tierRefType == "phonemic" and hasSeparatedWords):
+  #   tierType = "phonemes"
+  #elseif(tierTypeRef == "
 
 #----------------------------------------------------------------------------------------------------
 pd.set_option('display.width', 500)
@@ -113,12 +121,11 @@ pd.set_option('display.width', 500)
 if __name__ == '__main__':
    runTests()
 
-filename0 = "../testData/daylight77a.eaf"
-filename1 = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
-doc1 = etree.parse(filename0)
-doc2 = etree.parse(filename1)
+#filename0 = "../testData/daylight77a.eaf"
+#filename1 = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+#doc1 = etree.parse(filename0)
+#doc2 = etree.parse(filename1)
 #line0 = Line(doc2, 0)
-
 # line0 = Line(doc, 0)
 
 
