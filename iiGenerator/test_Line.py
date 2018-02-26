@@ -8,7 +8,10 @@ def runTests():
    test_monkey_0()
    test_monkey_all()
    test_classifyTier()
-   #test_getHTML()
+   test_spokenTextToHtml()
+   test_tokenizedPhonemesToHtml()
+   test_freeTranslationToHtml()
+   test_toHTML()
 
 #----------------------------------------------------------------------------------------------------
 def test_daylight_0():
@@ -92,18 +95,89 @@ def test_classifyTier():
    assert(line0.classifyTier(3) == "unrecognized")
 
 #----------------------------------------------------------------------------------------------------
-def test_getHTML():
+def test_spokenTextToHtml():
 
-   print("--- test_monkey_all")
+   print("--- test_spokenTextToHtml")
 
+     # test the usual case: 4 tiers, each with content
    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
    doc = etree.parse(filename)
-   lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-   line = Line(doc, 0)
-   lineText = line.getSpokenText()
-   print("%2d) %s" % (0, lineText))
-   lineHtml = line.getHtml()
-   print("%2d) %s" % (0, lineHtml))
+   line6 = Line(doc, 6)   # in ayapanec, 4 tiers:, default-lt, phonemic with 7 tokens, translation into english, trans by phoneme 7 tokens
+   tierCount = line6.getTable().shape[0]
+   assert(tierCount == 4)
+   assert(line6.classifyTier(0) == "spokenText")
+   html = line6.spokenTextToHtml(0)
+   assert(html.find("playAnnotation(28417, 35221)") > 300)
+   assert(html.find("<i>Ke jejn makput. Makndüj mbeʹ ii maknhwej maj.</i>") > 440)
+   assert(html[0:4] == '<tr ')
+   assert(html[len(html)-5:len(html)] == '</tr>')
+
+#----------------------------------------------------------------------------------------------------
+def test_tokenizedPhonemesToHtml():
+
+   print("--- test_tokenizedPhonemesToHtml")
+
+     # test the usual case: 4 tiers, each with content
+   filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+   doc = etree.parse(filename)
+   line6 = Line(doc, 6)   # in ayapanec, 4 tiers:, default-lt, phonemic with 7 tokens, translation into english, trans by phoneme 7 tokens
+   tierCount = line6.getTable().shape[0]
+   assert(tierCount == 4)
+   assert(line6.classifyTier(1) == "tokenizedPhonemes")
+   html = line6.tokenizedPhonemesToHtml(1)
+   assert(html[0:4] == '<tr ')
+   assert(html[len(html)-5:len(html)] == '</tr>')
+   assert(html.find("<tr class='CuPED–annotation–line CuPED–annotation–tier–2'>") == 0)
+   assert(html.count("td>") == 16)   # 8 pairs of <td> ... </td>
+
+
+#----------------------------------------------------------------------------------------------------
+def test_tokenizedPhonemesTranslatedToHtml():
+
+   print("--- test_tokenizedPhonemesTranslatedToHtml")
+
+     # test the usual case: 4 tiers, each with content
+   filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+   doc = etree.parse(filename)
+   line6 = Line(doc, 6)   # in ayapanec, 4 tiers:, default-lt, phonemic with 7 tokens, translation into english, trans by phoneme 7 tokens
+   tierCount = line6.getTable().shape[0]
+   assert(tierCount == 4)
+   assert(line6.classifyTier(3) == "tokenizedPhonemesTranslated")
+   html = line6.tokenizedPhonemesTranslatedToHtml(3)
+   assert(html[0:4] == '<tr ')
+   assert(html[len(html)-5:len(html)] == '</tr>')
+   assert(html.find("<tr class='CuPED–annotation–line CuPED–annotation–tier–3'>") == 0)
+   assert(html.count("td>") == 16)   # 8 pairs of <td> ... </td>
+
+#----------------------------------------------------------------------------------------------------
+def test_freeTranslationToHtml():
+
+   print("--- test_freeTranslationToHtml")
+
+     # test the usual case: 4 tiers, each with content
+   filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+   doc = etree.parse(filename)
+   line6 = Line(doc, 6)   # in ayapanec, 4 tiers:, default-lt, phonemic with 7 tokens, translation into english, trans by phoneme 7 tokens
+   tierCount = line6.getTable().shape[0]
+   assert(tierCount == 4)
+   assert(line6.classifyTier(2) == "freeTranslation")
+   html = line6.freeTranslationToHtml(3)
+   assert(html[0:4] == '<tr ')
+   assert(html[len(html)-5:len(html)] == '</tr>')
+   assert(html.find('<tr class="CuPED-annotation-line CuPED-annotation-tier-4">') == 0)
+   assert(html.count("<td") == 1)
+   assert(html.count("</td>") == 1)
+
+#----------------------------------------------------------------------------------------------------
+def test_toHTML():
+
+   print("--- test_toHTML")
+
+filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+doc = etree.parse(filename)
+lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
+line = Line(doc, 6)
+html = line.toHtml()
 
 #----------------------------------------------------------------------------------------------------
 # david beck email (28 jan 2018)

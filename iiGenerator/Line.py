@@ -49,34 +49,95 @@ class Line:
      return ("unrecognized")
 
 
+   #----------------------------------------------------------------------------------------------------
    def getSpokenText(self):
      return(self.tbl.ix[0, "TEXT"])
 
-   def spokenTextToHtml(obj):
+   #----------------------------------------------------------------------------------------------------
+   def spokenTextToHtml(self, tierNumber):
 
-      """
-        emulate this form:
-          <tr class="CuPED-annotation-line CuPED-annotation-tier-0">
-            <td rowspan="4" width="25px">1)<br />
+     template = \
+      """<tr class="CuPED-annotation-line CuPED-annotation-tier-0">
+            <td rowspan="4" width="25px">1)<br/>
               <img class="alignnone size-full wp-image-481"
                    src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"
-	           alt="speaker" width="25" height="25"  onclick="playAnnotation(0.388, 8.895)"/>
+	           alt="speaker" width="25" height="25"  onclick="playAnnotation(%d, %d)"/>
                </td>
             <td class="CuPED-annotation-text" colspan="2">
-               <i>Por ejemplo el, como se llama, el mono,</i>
+               <i>%s</i>
                </td>
-          </tr>
-      """
-      html = ""
+          </tr>"""
+     tierObj = self.getTable().ix[tierNumber].to_dict()
+     html = template % (tierObj['START'], tierObj['END'], tierObj['TEXT'])
+     return(html)
 
+   #----------------------------------------------------------------------------------------------------
+   def tokenizedPhonemesToHtml(self, tierNumber):
 
+     template = \
+      """<tr class="CuPED–annotation–line CuPED–annotation–tier–2">
+           <td></td>
+           <td>heM</td>
+           <td>...</td>
+         </tr>"""
+
+     tierObj = self.getTable().ix[tierNumber].to_dict()
+     tokens = tierObj['TEXT'].split("\t")
+     html = "<tr class='CuPED–annotation–line CuPED–annotation–tier–2'>"
+     for token in tokens:
+        html += " <td>%s</td>\n" % token
+     html += "</tr>"
+     return(html)
+
+   #----------------------------------------------------------------------------------------------------
+   def tokenizedPhonemesTranslatedToHtml(self, tierNumber):
+
+     template = \
+      """<tr class="CuPED–annotation–line CuPED–annotation–tier–3">
+           <td>que</td>
+           <td>heM</td>
+           <td>...</td>
+         </tr>"""
+
+     tierObj = self.getTable().ix[tierNumber].to_dict()
+     tokens = tierObj['TEXT'].split("\t")
+     html = "<tr class='CuPED–annotation–line CuPED–annotation–tier–3'>"
+     for token in tokens:
+        html += " <td>%s</td>\n" % token
+     html += "</tr>"
+     return(html)
+
+   #----------------------------------------------------------------------------------------------------
+   def freeTranslationToHtml(self, tierNumber):
+
+     template = \
+      """<tr class="CuPED-annotation-line CuPED-annotation-tier-4"> <td colspan="8">&lsquo;%s&rsquo;</td>
+         </tr>"""
+
+     tierObj = self.getTable().ix[tierNumber].to_dict()
+     html = template % tierObj["TEXT"]
+     return(html)
+
+   #----------------------------------------------------------------------------------------------------
    def toHtml(self):
       tbl = self.getTable()
-      # prepend <table id=""> <tbody> then for each row in tbl.shape(0)
-      # dict = tbl.to_dict(orient='records')[row]
-      # tierToHtml(dict)
-      return("<h4> %s </h4>" % self.getSpokenText())
+      tierCount = self.getTable().shape[0]
+      html = "<html><body><table>"
+      for tierNumber in range(tierCount):
+         tierType = self.classifyTier(tierNumber)
+         if(tierType == "spokenText"):
+            html += self.spokenTextToHtml(tierNumber)
+         elif(tierType == "tokenizedPhonemes"):
+            html += self.tokenizedPhonemesToHtml(tierNumber)
+         elif(tierType == "tokenizedPhonemesTranslated"):
+            html += self.tokenizedPhonemesTranslatedToHtml(tierNumber)
+         elif(tierType == "freeTranslation"):
+            html += self.freeTranslationToHtml(tierNumber)
+      html += "</table></body></html>"
 
+      return(html)
+
+   #----------------------------------------------------------------------------------------------------
    def tmp(self):
                # should be exactly one alignable tier, so it is safe to get the first one found
       alignableTierType_id = self.doc.find("LINGUISTIC_TYPE[@TIME_ALIGNABLE='true']").attrib["LINGUISTIC_TYPE_ID"]
