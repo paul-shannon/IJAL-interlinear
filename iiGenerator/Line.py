@@ -41,9 +41,9 @@ class Line:
      if((tierType == "default-lt") and (hasTimes)):
         return("spokenText")
      if(tierType == "phonemic" and hasTokenizedText):
-        return("tokenizedPhonemes")
+        return("tokenizedWords")
      if(tierType == "translation" and hasTokenizedText):
-        return("tokenizedPhonemesTranslated")
+        return("tokenizedGlosses")
      if(tierType == "translation" and hasText and not hasTokenizedText):
         return("freeTranslation")
      return ("unrecognized")
@@ -56,14 +56,13 @@ class Line:
    #----------------------------------------------------------------------------------------------------
    def spokenTextToHtml(self, tierNumber):
 
-     template = \
-      """<tr class="CuPED-annotation-line CuPED-annotation-tier-0">
+     template =  """<tr>
             <td rowspan="4" width="25px">1)<br/>
               <img class="alignnone size-full wp-image-481"
                    src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"
 	           alt="speaker" width="25" height="25"  onclick="playAnnotation(%d, %d)"/>
                </td>
-            <td class="CuPED-annotation-text" colspan="2">
+            <td colspan="2">
                <i>%s</i>
                </td>
           </tr>"""
@@ -72,10 +71,10 @@ class Line:
      return(html)
 
    #----------------------------------------------------------------------------------------------------
-   def tokenizedPhonemesToHtml(self, tierNumber):
+   def tokenizedWordsToHtml(self, tierNumber):
 
      template = \
-      """<tr class="CuPED–annotation–line CuPED–annotation–tier–2">
+      """<tr>
            <td></td>
            <td>heM</td>
            <td>...</td>
@@ -83,17 +82,17 @@ class Line:
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
      tokens = tierObj['TEXT'].split("\t")
-     html = "<tr class='CuPED–annotation–line CuPED–annotation–tier–2'>"
+     html = "<tr>"
      for token in tokens:
-        html += " <td>%s</td>\n" % token
+        html += "<td>%s</td>" % token
      html += "</tr>"
      return(html)
 
    #----------------------------------------------------------------------------------------------------
-   def tokenizedPhonemesTranslatedToHtml(self, tierNumber):
+   def tokenizedGlossesToHtml(self, tierNumber):
 
      template = \
-      """<tr class="CuPED–annotation–line CuPED–annotation–tier–3">
+      """<tr>
            <td>que</td>
            <td>heM</td>
            <td>...</td>
@@ -101,9 +100,9 @@ class Line:
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
      tokens = tierObj['TEXT'].split("\t")
-     html = "<tr class='CuPED–annotation–line CuPED–annotation–tier–3'>"
+     html = "<tr>"
      for token in tokens:
-        html += " <td>%s</td>\n" % token
+        html += "<td>%s</td>" % token
      html += "</tr>"
      return(html)
 
@@ -111,7 +110,7 @@ class Line:
    def freeTranslationToHtml(self, tierNumber):
 
      template = \
-      """<tr class="CuPED-annotation-line CuPED-annotation-tier-4"> <td colspan="8">&lsquo;%s&rsquo;</td>
+      """<tr><td colspan="8">&lsquo;%s&rsquo;</td>
          </tr>"""
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
@@ -127,10 +126,10 @@ class Line:
          tierType = self.classifyTier(tierNumber)
          if(tierType == "spokenText"):
             html += self.spokenTextToHtml(tierNumber)
-         elif(tierType == "tokenizedPhonemes"):
-            html += self.tokenizedPhonemesToHtml(tierNumber)
-         elif(tierType == "tokenizedPhonemesTranslated"):
-            html += self.tokenizedPhonemesTranslatedToHtml(tierNumber)
+         elif(tierType == "tokenizedWords"):
+            html += self.tokenizedWordsToHtml(tierNumber)
+         elif(tierType == "tokenizedGlosses"):
+            html += self.tokenizedGlossesToHtml(tierNumber)
          elif(tierType == "freeTranslation"):
             html += self.freeTranslationToHtml(tierNumber)
       html += "</table></body></html>"

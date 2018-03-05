@@ -9,7 +9,7 @@ def runTests():
    test_monkey_all()
    test_classifyTier()
    test_spokenTextToHtml()
-   test_tokenizedPhonemesToHtml()
+   test_tokenizedWordsToHtml()
    test_freeTranslationToHtml()
    test_toHTML()
 
@@ -81,9 +81,9 @@ def test_classifyTier():
    tierCount = line6.getTable().shape[0]
    assert(tierCount == 4)
    assert(line6.classifyTier(0) == "spokenText")
-   assert(line6.classifyTier(1) == "tokenizedPhonemes")
+   assert(line6.classifyTier(1) == "tokenizedWords")
    assert(line6.classifyTier(2) == "freeTranslation")
-   assert(line6.classifyTier(3) == "tokenizedPhonemesTranslated")
+   assert(line6.classifyTier(3) == "tokenizedGlosses")
 
        # now try a degenerate case, from one of the Spanish-only introductory lines
    line0 = Line(doc, 0)
@@ -107,15 +107,15 @@ def test_spokenTextToHtml():
    assert(tierCount == 4)
    assert(line6.classifyTier(0) == "spokenText")
    html = line6.spokenTextToHtml(0)
-   assert(html.find("playAnnotation(28417, 35221)") > 300)
-   assert(html.find("<i>Ke jejn makput. Makndüj mbeʹ ii maknhwej maj.</i>") > 440)
-   assert(html[0:4] == '<tr ')
+   assert(html.find("playAnnotation(28417, 35221)") > 200)
+   assert(html.find("<i>Ke jejn makput. Makndüj mbeʹ ii maknhwej maj.</i>") > 300)
+   assert(html[0:4] == '<tr>')
    assert(html[len(html)-5:len(html)] == '</tr>')
 
 #----------------------------------------------------------------------------------------------------
-def test_tokenizedPhonemesToHtml():
+def test_tokenizedWordsToHtml():
 
-   print("--- test_tokenizedPhonemesToHtml")
+   print("--- test_tokenizedWordsToHtml")
 
      # test the usual case: 4 tiers, each with content
    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
@@ -123,18 +123,16 @@ def test_tokenizedPhonemesToHtml():
    line6 = Line(doc, 6)   # in ayapanec, 4 tiers:, default-lt, phonemic with 7 tokens, translation into english, trans by phoneme 7 tokens
    tierCount = line6.getTable().shape[0]
    assert(tierCount == 4)
-   assert(line6.classifyTier(1) == "tokenizedPhonemes")
-   html = line6.tokenizedPhonemesToHtml(1)
-   assert(html[0:4] == '<tr ')
+   assert(line6.classifyTier(1) == "tokenizedWords")
+   html = line6.tokenizedWordsToHtml(1)
+   assert(html[0:4] == '<tr>')
    assert(html[len(html)-5:len(html)] == '</tr>')
-   assert(html.find("<tr class='CuPED–annotation–line CuPED–annotation–tier–2'>") == 0)
    assert(html.count("td>") == 16)   # 8 pairs of <td> ... </td>
 
-
 #----------------------------------------------------------------------------------------------------
-def test_tokenizedPhonemesTranslatedToHtml():
+def test_tokenizedGlossesToHtml():
 
-   print("--- test_tokenizedPhonemesTranslatedToHtml")
+   print("--- test_tokenizedGlossesToHtml")
 
      # test the usual case: 4 tiers, each with content
    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
@@ -142,9 +140,9 @@ def test_tokenizedPhonemesTranslatedToHtml():
    line6 = Line(doc, 6)   # in ayapanec, 4 tiers:, default-lt, phonemic with 7 tokens, translation into english, trans by phoneme 7 tokens
    tierCount = line6.getTable().shape[0]
    assert(tierCount == 4)
-   assert(line6.classifyTier(3) == "tokenizedPhonemesTranslated")
-   html = line6.tokenizedPhonemesTranslatedToHtml(3)
-   assert(html[0:4] == '<tr ')
+   assert(line6.classifyTier(3) == "tokenizedGlosses")
+   html = line6.tokenizedGlossesToHtml(3)
+   assert(html[0:4] == '<tr>')
    assert(html[len(html)-5:len(html)] == '</tr>')
    assert(html.find("<tr class='CuPED–annotation–line CuPED–annotation–tier–3'>") == 0)
    assert(html.count("td>") == 16)   # 8 pairs of <td> ... </td>
@@ -162,9 +160,9 @@ def test_freeTranslationToHtml():
    assert(tierCount == 4)
    assert(line6.classifyTier(2) == "freeTranslation")
    html = line6.freeTranslationToHtml(3)
-   assert(html[0:4] == '<tr ')
+   assert(html[0:4] == '<tr>')
    assert(html[len(html)-5:len(html)] == '</tr>')
-   assert(html.find('<tr class="CuPED-annotation-line CuPED-annotation-tier-4">') == 0)
+   assert(html.find('<tr>') == 0)
    assert(html.count("<td") == 1)
    assert(html.count("</td>") == 1)
 
