@@ -54,20 +54,14 @@ class Line:
      return(self.tbl.ix[0, "TEXT"])
 
    #----------------------------------------------------------------------------------------------------
-   def spokenTextToHtml(self, tierNumber):
+   def spokenTextToHtml(self, tierNumber, lineNumber):
 
      template =  """<tr>
-            <td rowspan="4" width="25px">1)<br/>
-              <img class="alignnone size-full wp-image-481"
-                   src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"
-	           alt="speaker" width="25" height="25"  onclick="playAnnotation(%d, %d)"/>
-               </td>
-            <td colspan="2">
-               <i>%s</i>
-               </td>
+            <td>%d)</td>
+            <td colspan=8><b><i>%s</i></b> </td>
           </tr>"""
      tierObj = self.getTable().ix[tierNumber].to_dict()
-     html = template % (tierObj['START'], tierObj['END'], tierObj['TEXT'])
+     html = template % (lineNumber, tierObj['TEXT'])   # tierObj['START'], tierObj['END']
      return(html)
 
    #----------------------------------------------------------------------------------------------------
@@ -82,7 +76,7 @@ class Line:
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
      tokens = tierObj['TEXT'].split("\t")
-     html = "<tr>"
+     html = "<tr><td>&nbsp;</td>"
      for token in tokens:
         html += "<td>%s</td>" % token
      html += "</tr>"
@@ -100,7 +94,7 @@ class Line:
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
      tokens = tierObj['TEXT'].split("\t")
-     html = "<tr>"
+     html = "<tr><td>&nbsp;</td>"
      for token in tokens:
         html += "<td>%s</td>" % token
      html += "</tr>"
@@ -110,7 +104,7 @@ class Line:
    def freeTranslationToHtml(self, tierNumber):
 
      template = \
-      """<tr><td colspan="8">&lsquo;%s&rsquo;</td>
+      """<tr><td>&nbsp;</td><td colspan="8">&lsquo;%s&rsquo;</td>
          </tr>"""
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
@@ -118,21 +112,36 @@ class Line:
      return(html)
 
    #----------------------------------------------------------------------------------------------------
+   def getHtmlHead(self):
+
+      playerLibrary = open("player2.js").read();
+      #s = "<head><script src='http://localhost:9999/player2.js'></script></head>"
+      s = "<head></head>"
+      return(s)
+
+   #----------------------------------------------------------------------------------------------------
    def toHtml(self):
       tbl = self.getTable()
       tierCount = self.getTable().shape[0]
-      html = "<html><body><table>"
+      html = "<html>"
+      html += self.getHtmlHead();
+      html += "<body><table border='1'>"
+      translationHtml = ""
+      storyLineNumber = 1
       for tierNumber in range(tierCount):
          tierType = self.classifyTier(tierNumber)
+         print("tier number %d, type %s" % (tierNumber, tierType))
          if(tierType == "spokenText"):
-            html += self.spokenTextToHtml(tierNumber)
+            html += self.spokenTextToHtml(tierNumber, storyLineNumber)
          elif(tierType == "tokenizedWords"):
             html += self.tokenizedWordsToHtml(tierNumber)
          elif(tierType == "tokenizedGlosses"):
             html += self.tokenizedGlossesToHtml(tierNumber)
          elif(tierType == "freeTranslation"):
-            html += self.freeTranslationToHtml(tierNumber)
+            translationHtml = self.freeTranslationToHtml(tierNumber)
+      html += translationHtml
       html += "</table></body></html>"
+      html = html.replace("\n", "")
 
       return(html)
 

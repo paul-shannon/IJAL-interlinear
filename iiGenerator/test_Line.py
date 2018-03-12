@@ -5,6 +5,7 @@ from Line import *
 def runTests():
 
    test_daylight_0()
+   test_daylight_1_4()
    test_monkey_0()
    test_monkey_all()
    test_classifyTier()
@@ -27,6 +28,21 @@ def test_daylight_0():
    assert(list(tbl.ix[0, ["ANNOTATION_ID", "START", "END", "TEXT"]]) ==['a1', 0.0, 768.0, 'dil tu'])
    assert(list(tbl.ix[1, ["ANNOTATION_ID", "TEXT"]]) == ['a332', 'focal'])
    assert(tbl.ix[0, "ANNOTATION_ID"] == tbl.ix[1, "ANNOTATION_REF"])
+
+#----------------------------------------------------------------------------------------------------
+def test_daylight_1_4():
+
+   print("--- test_daylight_1_4")
+   filename = "../testData/daylight_1_4.eaf"
+   doc = etree.parse(filename)
+   line0 = Line(doc, 0)
+   tbl = line0.getTable()
+   tierTypes = list(tbl.ix[:, "LINGUISTIC_TYPE_REF"])
+   assert(tierTypes== ['default-lt', 'phonemic', 'translation', 'translation'])
+   assert(tbl.shape == (4, 10))
+   #assert(list(tbl.ix[0, ["ANNOTATION_ID", "START", "END", "TEXT"]]) ==['a1', 0.0, 768.0, 'dil tu'])
+   #assert(list(tbl.ix[1, ["ANNOTATION_ID", "TEXT"]]) == ['a332', 'focal'])
+   #assert(tbl.ix[0, "ANNOTATION_ID"] == tbl.ix[1, "ANNOTATION_REF"])
 
 #----------------------------------------------------------------------------------------------------
 def test_monkey_0():
@@ -106,9 +122,9 @@ def test_spokenTextToHtml():
    tierCount = line6.getTable().shape[0]
    assert(tierCount == 4)
    assert(line6.classifyTier(0) == "spokenText")
-   html = line6.spokenTextToHtml(0)
-   assert(html.find("playAnnotation(28417, 35221)") > 200)
-   assert(html.find("<i>Ke jejn makput. Makndüj mbeʹ ii maknhwej maj.</i>") > 300)
+   html = line6.spokenTextToHtml(0, 99)
+   #assert(html.find("playAnnotation(28417, 35221)") > 200)
+   assert(html.find("Ke jejn makput. Makndüj mbeʹ ii maknhwej maj.") > 50)
    assert(html[0:4] == '<tr>')
    assert(html[len(html)-5:len(html)] == '</tr>')
 
@@ -127,7 +143,7 @@ def test_tokenizedWordsToHtml():
    html = line6.tokenizedWordsToHtml(1)
    assert(html[0:4] == '<tr>')
    assert(html[len(html)-5:len(html)] == '</tr>')
-   assert(html.count("td>") == 16)   # 8 pairs of <td> ... </td>
+   assert(html.count("td>") == 18)   # 8 pairs of <td> ... </td>
 
 #----------------------------------------------------------------------------------------------------
 def test_tokenizedGlossesToHtml():
@@ -171,11 +187,21 @@ def test_toHTML():
 
    print("--- test_toHTML")
 
-filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
-doc = etree.parse(filename)
-lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-line = Line(doc, 6)
-html = line.toHtml()
+   filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+   doc = etree.parse(filename)
+   lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
+   line = Line(doc, 6)
+   html = line.toHtml()
+
+#----------------------------------------------------------------------------------------------------
+def test_toHTML_daylight():
+
+   print("--- test_toHTML_daylight")
+   filename = "../testData/daylight77a.eaf"
+   doc = etree.parse(filename)
+   lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
+   line = Line(doc, 0)
+   html = line.toHtml()
 
 #----------------------------------------------------------------------------------------------------
 # david beck email (28 jan 2018)
