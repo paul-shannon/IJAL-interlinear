@@ -1,0 +1,74 @@
+<html>
+<head>
+    <title> CSS grid demo </title>
+
+<style>
+.line {
+  display: grid;
+  grid-template-columns: auto;
+  background-color: #2196F3;
+  padding: 10px;
+  margin:  50px;
+}
+.tier {
+  display: grid;
+  background-color: rgba(255, 255, 255, 0.8);
+  grid-template-columns: auto;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.speech-tier{
+  background-color: rgba(255, 255, 255, 0.8);
+  grid-template-columns: auto;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+  word-spacing: 20px;
+}
+.tier-cell {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 0px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 20px;
+  text-align: center;
+}
+
+</style>
+
+</head>
+
+<body>
+<div class="line">
+  <div class="speech-tier">ʔal kʷi tu- &nbsp; &nbsp; ʔal kʷi tu-haʔkʷ gʷәl xʷiʔ gʷә-tu-s-lәx̌-il.</div>
+  <div class="tier" style="grid-template-columns: repeat(9, 11%)">
+    <div class="tier-cell">ʔal</div>
+    <div class="tier-cell">kʷi</div>
+    <div class="tier-cell">tu-,</div>
+    <div class="tier-cell">ʔal</div>
+    <div class="tier-cell">kʷi</div>
+    <div class="tier-cell">tu-haʔkʷ</div>
+    <div class="tier-cell">gʷәl</div>
+    <div class="tier-cell">xʷiʔ</div>
+    <div class="tier-cell">gʷә-tu-s-lәx̌-il</div>
+    </div>
+
+  <div class="tier" style="grid-template-columns: repeat(9, 11%)">
+    <div class="tier-cell">at</div>
+    <div class="tier-cell">REM</div>
+    <div class="tier-cell">past</div>
+    <div class="tier-cell">at</div>
+    <div class="tier-cell">REM</div>
+    <div class="tier-cell">past=long.time</div>
+    <div class="tier-cell">SCONJ</div>
+    <div class="tier-cell">NEG</div>
+    <div class="tier-cell">subj= past= daylight</div>
+    </div>
+
+  <div class="tier">In the distant past, there was no daylight.</div>
+</div>
+
+</body>
