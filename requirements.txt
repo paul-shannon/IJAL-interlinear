@@ -1,3 +1,2 @@
-xml
-re
-sphinx
+Sphinx==1.6.7
+

@@ -1,6 +1,6 @@
 import pandas as pd
 from xml.etree import ElementTree as etree
-
+from pprint import pprint
 #------------------------------------------------------------------------------------------------------------------------
 class Line:
 
@@ -48,6 +48,11 @@ class Line:
         return("freeTranslation")
      return ("unrecognized")
 
+
+   #----------------------------------------------------------------------------------------------------
+   def show(self):
+
+      pprint(vars(self))
 
    #----------------------------------------------------------------------------------------------------
    def getSpokenText(self):

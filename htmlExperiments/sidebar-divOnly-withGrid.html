@@ -1,8 +1,33 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title> CSS grid demo </title>
-
 <style>
+
+.main{
+  border: 1px solid gray;
+  height: 500px;
+  margin: 20px;
+}
+  
+.sidebar{
+  float: left;
+  width: 5%;
+  border: 1px solid gray;
+  margin-right: 10px;
+  padding-left: 5px;
+  }  
+
+.content{
+  float: left;
+  width: 95%;
+  height: 100%;
+  background-color: lightyellow;
+  border: 1px solid red;
+  margin: 0px;
+  margin-bottom: 20px;
+  overflow-x: scroll;
+  white-space: nowrap;
+  }
 
 .line-sidebar{
     grid-area: sidebar;
@@ -14,7 +39,7 @@
   background-color: white;
   border: 1px solid gray;
   padding: 0px;
-  margin:  100px;
+  margin:  30px;
   }
 
 .speech-tier{
@@ -46,8 +71,6 @@
   font-size: 30px;
   margin: auto;
   width: 90%;
-  overflow-x: scroll;
-  white-space: nowrap;
   }
 
 .phoneme-cell {
@@ -60,12 +83,23 @@
   }
 
 
-
 </style>
-
 </head>
-
 <body>
+
+<h1>Sidebar Demo</h1>
+
+<p>Minimal line layout container</p>
+
+<div class="main">
+  <div class="sidebar">
+    1)
+    <p>
+   <img src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"></img>
+    
+  </div>
+  <div class="content">
+
 <div class="line">
   <div class="speech-tier">ʔal kʷi tu- &nbsp; &nbsp; ʔal kʷi tu-haʔkʷ gʷәl xʷiʔ gʷә-tu-s-lәx̌-il.</div>
 
@@ -96,4 +130,9 @@
   <div class="gloss-tier">In the distant past, there was no daylight.</div>
 </div>
 
+
+  </div>
+</div>
+
 </body>
+</html>

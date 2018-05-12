@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+.line-wrapper{
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-columns: 1fr 20fr;
+  //border: 1px solid gray;
+  margin: 20px;
+}
+  
+.line-sidebar{
+  //border: 1px solid gray;
+  padding: 10px;
+  margin-right: 10px;
+  }  
+
+.line-content{
+  height: 100%;
+  //background-color: lightyellow;
+  //border: 1px solid red;
+  margin: 0px;
+  margin-bottom: 20px;
+  overflow-x: scroll;
+  white-space: nowrap;
+  }
+
+
+.line {
+  display: grid;
+  background-color: white;
+  //border: 1px solid gray;
+  padding: 0px;
+  margin-top:  30px;
+  margin-bottom:  30px;
+  }
+
+.speech-tier{
+  background-color: white;
+  grid-template-columns: auto;
+  //border: 0px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
+  word-spacing: 20px;
+  }
+
+.gloss-tier{
+  background-color: white;
+  grid-template-columns: auto;
+  //border: 0px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
+  word-spacing: 20px;
+  }
+
+.phoneme-tier {
+  display: grid;
+  background-color: white;
+  //border: 0px solid rgba(0, 0, 0, 0.8);
+  grid-template-columns: 4ch 5ch 5ch 4ch 5ch 12ch 7ch 5ch 16ch;
+  grid-column-gap: 2%;
+  font-size: 30px;
+  margin: 5px;
+  width: 95%;
+  }
+
+.phoneme-cell {
+  background-color: white;
+  border: 1px solid lightgray;
+  margin-bottom: 2px;
+  padding: 3px;
+  font-size: 20px;
+  text-align: center;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="story">
+   <h1>IJAL Layout Demo</h1>
+
+<div class="line-wrapper">
+  <div class="line-sidebar">
+    1)
+    <p>
+   <img src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"></img>
+  </div>
+  <div class="line-content">
+
+    <div class="line">
+      <div class="speech-tier">ʔal kʷi tu- &nbsp; &nbsp; ʔal kʷi tu-haʔkʷ gʷәl xʷiʔ gʷә-tu-s-lәx̌-il.</div>
+      
+      <div class="phoneme-tier" style="grid-template-columns: 4ch 5ch 5ch 4ch 5ch 12ch 7ch 5ch 16ch;">
+        <div class="phoneme-cell">ʔal</div>
+        <div class="phoneme-cell">kʷi</div>
+        <div class="phoneme-cell">tu-,</div>
+        <div class="phoneme-cell">ʔal</div>
+        <div class="phoneme-cell">kʷi</div>
+        <div class="phoneme-cell">tu-haʔkʷ</div>
+        <div class="phoneme-cell">gʷәl</div>
+        <div class="phoneme-cell">xʷiʔ</div>
+        <div class="phoneme-cell">gʷә-tu-s-lәx̌-il</div>
+      </div>
+      
+      <div class="phoneme-tier" style="grid-template-columns: 4ch 5ch 5ch 4ch 5ch 12ch 7ch 5ch 16ch;">
+        <div class="phoneme-cell">at</div>
+        <div class="phoneme-cell">REM</div>
+        <div class="phoneme-cell">past</div>
+        <div class="phoneme-cell">at</div>
+        <div class="phoneme-cell">REM</div>
+        <div class="phoneme-cell">past=long.time</div>
+        <div class="phoneme-cell">SCONJ</div>
+        <div class="phoneme-cell">NEG</div>
+        <div class="phoneme-cell">subj=past=daylight</div>
+      </div>
+      
+      <div class="gloss-tier">In the distant past, there was no daylight.</div>
+    </div>
+  </div>
+  </div>
+  
+    <div class="line-wrapper">
+      <div class="line-sidebar">2)<p><img src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"></img></div>
+      <div class="line-content">
+        
+        <div class="line">
+          <div class="speech-tier">x̌ʷul’ul’ bəc’ac tiʔəʔ diʔəʔ xʷʔax̌ʷaʔad ʔəshuyutub ʔə tsiʔəʔ diʔəʔ sƛ’alqəb</div>
+          
+          <div class="phoneme-tier"
+               style="grid-template-columns: 7ch 5ch 6ch 6ch 8ch 10ch 3ch 5ch 5ch 6ch;">
+            <div class="phoneme-cell">x̌ʷul’–ul’</div>
+            <div class="phoneme-cell">bəc’ac</div>
+            <div class="phoneme-cell">tiʔəʔ</div>
+            <div class="phoneme-cell">diʔəʔ</div>
+            <div class="phoneme-cell"">xʷʔax̌ʷaʔad</div>
+            <div class="phoneme-cell"">ʔas–huyu–txʷ–b</div>
+            <div class="phoneme-cell">ʔə</div>
+            <div class="phoneme-cell">tsiʔəʔ</div>
+            <div class="phoneme-cell">diʔəʔ</div>
+            <div class="phoneme-cell">sƛ’alqəb</div>
+          </div>
+          
+          <div class="phoneme-tier"
+               style="grid-template-columns: 7ch 5ch 6ch 6ch 8ch 10ch 3ch 5ch 5ch 6ch;">
+            <div class="phoneme-cell">intns–only</div>
+            <div class="phoneme-cell">snake</div>
+            <div class="phoneme-cell">prox</div>
+            <div class="phoneme-cell">here</div>
+            <div class="phoneme-cell">clam.basket</div>
+            <div class="phoneme-cell">stat–made–ecs–pass</div>
+            <div class="phoneme-cell">Pr</div>
+            <div class="phoneme-cell">prox:fem</div>
+            <div class="phoneme-cell">here</div>
+            <div class="phoneme-cell">monster</div>
+          </div>
+          
+          <div class="gloss-tier">The basket the Basket Ogress has made is just (composed of) snakes.</div>
+        </div>          
+    </div>
+    </div>
+</div>
+</div>
+
+</body>
+</html>

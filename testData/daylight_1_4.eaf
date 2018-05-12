@@ -14,7 +14,7 @@
         <TIME_SLOT TIME_SLOT_ID="ts3" TIME_VALUE="769"/>
         <TIME_SLOT TIME_SLOT_ID="ts4" TIME_VALUE="1450"/>
     </TIME_ORDER>
-    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="default-lt" TIER_ID="speech">
+    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="default-lt" TIER_ID="lushootseedSpeech">
         <ANNOTATION>
             <ALIGNABLE_ANNOTATION ANNOTATION_ID="a1" TIME_SLOT_REF1="ts1" TIME_SLOT_REF2="ts2">
                 <ANNOTATION_VALUE>ʔal kʷi tu-     ʔal kʷi tu-haʔkʷ gʷәl xʷiʔ gʷә-tu-s-lәx̌-il.</ANNOTATION_VALUE>
@@ -37,7 +37,7 @@
         </ANNOTATION>
 
     </TIER>
-    <TIER LINGUISTIC_TYPE_REF="phonemic" PARENT_REF="todo" TIER_ID="tier2">
+    <TIER LINGUISTIC_TYPE_REF="phonemic" PARENT_REF="todo" TIER_ID="phonemicLushootseed">
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a5" ANNOTATION_REF="a1">
                 <ANNOTATION_VALUE>ʔal	kʷi	tu-	ʔal	kʷi	tu-haʔkʷ	gʷәl	xʷiʔ	gʷә-tu-s-lәx̌-il</ANNOTATION_VALUE>
@@ -64,7 +64,7 @@
 
     </TIER>
 
-    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="speech" TIER_ID="translation">
+    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="speech" TIER_ID="phonemicTranslation">
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a9" ANNOTATION_REF="a5">
                 <ANNOTATION_VALUE>in	remote	past	in	remote	past	long-ago	and	not	daylight</ANNOTATION_VALUE>
@@ -92,7 +92,7 @@
      </TIER>
 
 
-    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="speech" TIER_ID="translation">
+    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="speech" TIER_ID="englishGloss">
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a13" ANNOTATION_REF="a1">
                 <ANNOTATION_VALUE>In the distant past, there was no daylight.</ANNOTATION_VALUE>

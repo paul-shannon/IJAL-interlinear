@@ -179,8 +179,8 @@ def test_freeTranslationToHtml():
    assert(html[0:4] == '<tr>')
    assert(html[len(html)-5:len(html)] == '</tr>')
    assert(html.find('<tr>') == 0)
-   assert(html.count("<td") == 1)
-   assert(html.count("</td>") == 1)
+   assert(html.count("<td") == 2)
+   assert(html.count("</td>") == 2)
 
 #----------------------------------------------------------------------------------------------------
 def test_toHTML():
@@ -196,12 +196,13 @@ def test_toHTML():
 #----------------------------------------------------------------------------------------------------
 def test_toHTML_daylight():
 
-   print("--- test_toHTML_daylight")
-   filename = "../testData/daylight77a.eaf"
-   doc = etree.parse(filename)
-   lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-   line = Line(doc, 0)
-   html = line.toHtml()
+print("--- test_toHTML_daylight")
+#filename = "../testData/daylight77a.eaf"
+filename = "../testData/daylight_1_4.eaf"
+doc = etree.parse(filename)
+lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
+line = Line(doc, 0)
+html = line.toHtml()
 
 #----------------------------------------------------------------------------------------------------
 # david beck email (28 jan 2018)

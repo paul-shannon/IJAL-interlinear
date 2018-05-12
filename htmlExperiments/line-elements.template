@@ -1,0 +1,14 @@
+    <div class="line">
+      <div class="speech-tier"></div>
+      
+      <div class="phoneme-tier">
+        <div class="phoneme-cell"></div>
+      </div>
+      
+      <div class="phoneme-tier">
+        <div class="phoneme-cell"></div>
+      </div>
+      
+      <div class="gloss-tier"></div>
+    </div>
+    
