@@ -1,6 +1,7 @@
 import pandas as pd
 from xml.etree import ElementTree as etree
 from pprint import pprint
+from yattag import *
 #------------------------------------------------------------------------------------------------------------------------
 class Line:
 
@@ -59,62 +60,43 @@ class Line:
      return(self.tbl.ix[0, "TEXT"])
 
    #----------------------------------------------------------------------------------------------------
-   def spokenTextToHtml(self, tierNumber, lineNumber):
+   def spokenTextToHtml(self, htmlDoc, tierNumber, lineNumber):
 
-     template =  """<tr>
-            <td>%d)</td>
-            <td colspan=8><b><i>%s</i></b> </td>
-          </tr>"""
      tierObj = self.getTable().ix[tierNumber].to_dict()
-     html = template % (lineNumber, tierObj['TEXT'])   # tierObj['START'], tierObj['END']
-     return(html)
+     speechText = tierObj['TEXT']
+     with htmlDoc.tag("div", klass="speech-tier"):
+        htmlDoc.text(speechText)
 
    #----------------------------------------------------------------------------------------------------
-   def tokenizedWordsToHtml(self, tierNumber):
-
-     template = \
-      """<tr>
-           <td></td>
-           <td>heM</td>
-           <td>...</td>
-         </tr>"""
+   def tokenizedWordsToHtml(self, htmlDoc, tierNumber):
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
-     tokens = tierObj['TEXT'].split("\t")
-     html = "<tr><td>&nbsp;</td>"
-     for token in tokens:
-        html += "<td>%s</td>" % token
-     html += "</tr>"
-     return(html)
+     phonemes = tierObj['TEXT'].split("\t")
+     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % len(p) for p in phonemes])
+     with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
+        for phoneme in phonemes:
+          with htmlDoc.tag("div", klass="phoneme-cell"):
+             htmlDoc.text(phoneme)
 
    #----------------------------------------------------------------------------------------------------
-   def tokenizedGlossesToHtml(self, tierNumber):
-
-     template = \
-      """<tr>
-           <td>que</td>
-           <td>heM</td>
-           <td>...</td>
-         </tr>"""
+   def tokenizedGlossesToHtml(self, htmlDoc, tierNumber):
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
-     tokens = tierObj['TEXT'].split("\t")
-     html = "<tr><td>&nbsp;</td>"
-     for token in tokens:
-        html += "<td>%s</td>" % token
-     html += "</tr>"
-     return(html)
+     phonemeGlosses = tierObj['TEXT'].split("\t")
+
+     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % len(p) for p in phonemeGlosses])
+     with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
+        for phonemeGloss in phonemeGlosses:
+          with htmlDoc.tag("div", klass="phoneme-cell"):
+             htmlDoc.text(phonemeGloss)
 
    #----------------------------------------------------------------------------------------------------
-   def freeTranslationToHtml(self, tierNumber):
-
-     template = \
-      """<tr><td>&nbsp;</td><td colspan="8">&lsquo;%s&rsquo;</td>
-         </tr>"""
+   def freeTranslationToHtml(self, htmlDoc, tierNumber):
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
-     html = template % tierObj["TEXT"]
-     return(html)
+     speechText = tierObj['TEXT']
+     with htmlDoc.tag("div", klass="speech-tier"):
+        htmlDoc.text(speechText)
 
    #----------------------------------------------------------------------------------------------------
    def getHtmlHead(self):
