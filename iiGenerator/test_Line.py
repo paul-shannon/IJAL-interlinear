@@ -37,7 +37,7 @@ def test_daylight_1_4():
    filename = "../testData/daylight_1_4.eaf"
    doc = etree.parse(filename)
    line0 = Line(doc, 0)
-   tbl = line0.getTable()                      
+   tbl = line0.getTable()
    tierTypes = list(tbl.ix[:, "LINGUISTIC_TYPE_REF"])
    assert(tierTypes== ['default-lt', 'phonemic', 'translation', 'translation'])
    assert(tbl.shape == (4, 10))
@@ -221,13 +221,40 @@ def test_toHTML():
 #----------------------------------------------------------------------------------------------------
 def test_toHTML_daylight():
 
-  print("--- test_toHTML_daylight")
-  #filename = "../testData/daylight77a.eaf"
-  filename = "../testData/daylight_1_4.eaf"
-  doc = etree.parse(filename)
-  lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-  line = Line(doc, 0)
-  html = line.toHtml()
+   print("--- test_toHTML_daylight")
+   filename = "../testData/daylight_1_4.eaf"
+   doc = etree.parse(filename)
+   lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
+
+   htmlDoc = Doc()
+
+   htmlDoc.asis('<!DOCTYPE html>')
+   with htmlDoc.tag('html', lang="en"):
+      with htmlDoc.tag('head'):
+         htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
+      with htmlDoc.tag('body'):
+
+        for lineNumber in range(lineCount):
+           with htmlDoc.tag("div",  klass="line-wrapper"):
+              with htmlDoc.tag("div", klass="line-sidebar"):
+                 htmlDoc.text("%d)" % (lineNumber + 1))
+              with htmlDoc.tag("div", klass="line-content"):
+                 with htmlDoc.tag("div", klass="line"):
+                    line = Line(doc, lineNumber)
+                    tierCount = line.getTable().shape[0]
+                    for t in range(tierCount):
+                       tierType = line.classifyTier(t)
+                       print("--- tier %d: %s" % (t, tierType))
+                       if(tierType == "spokenText"):
+                          line.spokenTextToHtml(htmlDoc, t)
+                       if(tierType == "tokenizedWords"):
+                          line.tokenizedWordsToHtml(htmlDoc, t)
+                       if(tierType == "tokenizedGlosses"):
+                          line.tokenizedGlossesToHtml(htmlDoc, t)
+                       if(tierType == "freeTranslation"):
+                          line.freeTranslationToHtml(htmlDoc, t)
+
+   print(indent(htmlDoc.getvalue()))
 
 #----------------------------------------------------------------------------------------------------
 # david beck email (28 jan 2018)

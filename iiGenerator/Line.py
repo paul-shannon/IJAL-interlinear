@@ -60,7 +60,7 @@ class Line:
      return(self.tbl.ix[0, "TEXT"])
 
    #----------------------------------------------------------------------------------------------------
-   def spokenTextToHtml(self, htmlDoc, tierNumber, lineNumber):
+   def spokenTextToHtml(self, htmlDoc, tierNumber): # , lineNumber):
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
      speechText = tierObj['TEXT']
@@ -95,7 +95,7 @@ class Line:
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
      speechText = tierObj['TEXT']
-     with htmlDoc.tag("div", klass="speech-tier"):
+     with htmlDoc.tag("div", klass="freeTranslation-tier"):
         htmlDoc.text(speechText)
 
    #----------------------------------------------------------------------------------------------------
