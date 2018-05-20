@@ -108,29 +108,8 @@ class Line:
 
    #----------------------------------------------------------------------------------------------------
    def toHtml(self):
-      tbl = self.getTable()
-      tierCount = self.getTable().shape[0]
-      html = "<html>"
-      html += self.getHtmlHead();
-      html += "<body><table border='1'>"
-      translationHtml = ""
-      storyLineNumber = 1
-      for tierNumber in range(tierCount):
-         tierType = self.classifyTier(tierNumber)
-         print("tier number %d, type %s" % (tierNumber, tierType))
-         if(tierType == "spokenText"):
-            html += self.spokenTextToHtml(tierNumber, storyLineNumber)
-         elif(tierType == "tokenizedWords"):
-            html += self.tokenizedWordsToHtml(tierNumber)
-         elif(tierType == "tokenizedGlosses"):
-            html += self.tokenizedGlossesToHtml(tierNumber)
-         elif(tierType == "freeTranslation"):
-            translationHtml = self.freeTranslationToHtml(tierNumber)
-      html += translationHtml
-      html += "</table></body></html>"
-      html = html.replace("\n", "")
 
-      return(html)
+      print("toHtml, nothing here yet")
 
    #----------------------------------------------------------------------------------------------------
    def tmp(self):
