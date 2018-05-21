@@ -1,8 +1,7 @@
 .line-wrapper{
   display: grid;
-  grid-template-columns: auto;
   grid-template-columns: 1fr 20fr;
-  border: 1px solid gray;
+  //border: 1px solid gray;
   margin: 20px;
 }
 
@@ -19,8 +18,8 @@
   //background-color: lightyellow;
   //border: 1px solid red;
   margin: 0px;
-  margin-bottom: 20px;
-  overflow-x: scroll;
+  margin-bottom: 2px;
+  overflow-x: auto;
   white-space: nowrap;
   }
 
@@ -31,7 +30,7 @@
   //border: 1px solid gray;
   padding: 0px;
   margin-top:  0px;
-  margin-bottom:  30px;
+  margin-bottom:  10px;
   }
 
 .speech-tier{

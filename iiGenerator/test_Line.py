@@ -34,9 +34,6 @@ def test_daylight_0():
 def test_daylight_1_4():
 
    print("--- test_daylight_1_4")
-   filename = "../testData/daylight_1_4.eaf"
-   doc = etree.parse(filename)
-   line0 = Line(doc, 0)
    tbl = line0.getTable()
    tierTypes = list(tbl.ix[:, "LINGUISTIC_TYPE_REF"])
    assert(tierTypes== ['default-lt', 'phonemic', 'translation', 'translation'])
@@ -267,21 +264,22 @@ def test_toHTML_daylight():
 #  have to match perfectly and exhaustively).
 #
 #  suggesting these tier types:
-#    1) text
-#    2) phonemes
-#    3) parsing
-#    4) glossing
+#    1) text                        (practical orthography)
+#    2) phonemes                    (phonemic transcription)
+#    3) parsing                     (phoneme by phoneme)
+#    4) glossing                    (each phoneme glossed)
 #    5) free translation language 1
 #    6) free translation language 2
 #
-#  this functions's first job is to idenitfy the tier type, using iformal rules
+#  this functions's first job is to idenitfy the tier type, using informal rules
+#
 def tierToHtml(tier):
 
   keys = list(tier.keys())
   assert(keys==['ANNOTATION_ID', 'LINGUISTIC_TYPE_REF', 'START', 'END', 'TEXT', 'ANNOTATION_REF',
                 'TIME_SLOT_REF1', 'TIME_SLOT_REF2', 'PARENT_REF', 'TIER_ID'])
 
-     # 4 types thus far: 0     default-lt, phonemic, translation, translation
+     # 4 types thus far:  default-lt, phonemic, translation, translation
      # are there any tiers with divided text, recognized by tabs and a parent/child
      # relationship, childTier.ANNOTATION_REF = parentTier.ANNOTATION_ID
 
@@ -297,8 +295,6 @@ def tierToHtml(tier):
   #   tierType = "phonemes"
   #elseif(tierTypeRef == "
 
-#----------------------------------------------------------------------------------------------------
-def exploreAlignmentOfTokenizedTiers():
 #----------------------------------------------------------------------------------------------------
 pd.set_option('display.width', 500)
 

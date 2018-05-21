@@ -30,14 +30,17 @@ class NewText:
               with self.htmlDoc.tag('body'):
 
                  for lineNumber in range(self.lineCount):
+                    line = Line(self.xmlDoc, lineNumber)
                     with self.htmlDoc.tag("div",  klass="line-wrapper"):
                        with self.htmlDoc.tag("div", klass="line-sidebar"):
                           self.htmlDoc.text("%d)" % (lineNumber + 1))
+                          self.htmlDoc.asis('<img src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"></img>')
+
                        with self.htmlDoc.tag("div", klass="line-content"):
                           with self.htmlDoc.tag("div", klass="line"):
-                             line = Line(self.xmlDoc, lineNumber)
                              tierCount = line.getTable().shape[0]
-                             for t in range(tierCount):
+                             desiredTierDisplayOrder = [0,1,3,2]
+                             for t in desiredTierDisplayOrder: #range(tierCount):
                                 tierType = line.classifyTier(t)
                                 #print("--- tier %d: %s" % (t, tierType))
                                 if(tierType == "spokenText"):

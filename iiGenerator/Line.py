@@ -10,6 +10,14 @@ class Line:
    tierElements = []
    doc = None
    lineNumber = None
+      # phoneme tokens and their gloss tokens are equal in number, often different in length,
+      # and displayed in horizontal alignment, each vertical pair in a horizontal space
+      # large enough to holder the longer of the two.  for instance, from Harry Moses
+      # how daylight was stolen, line 3, fourth word, needs 18 character spaces
+      #              gʷә-s-čal
+      #              uncertain-means-get
+      # this next member variable holds these values once calculated
+   phonemeSpacing = []
 
    def __init__(self, doc, lineNumber):
      self.doc = doc
@@ -21,8 +29,10 @@ class Line:
        # [{'LINGUISTIC_TYPE_REF': 'default-lt', 'TIER_ID': 'AYA'},
        #  {'LINGUISTIC_TYPE_REF': 'phonemic', 'PARENT_REF': 'AYA', 'TIER_ID': 'AYA2'},
        #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA', 'TIER_ID': 'ENG'},
-       # {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA2', 'TIER_ID': 'GL'}]
+       #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA2', 'TIER_ID': 'GL'}]
      self.tbl = buildTable(doc, self.allElements)
+     self.phonemeSpacing = [];
+     self.calculateSpacingOfPhonemeAndGlossTokens()
 
    def getTierCount(self):
        return(len(self.tierElements))
@@ -51,6 +61,23 @@ class Line:
 
 
    #----------------------------------------------------------------------------------------------------
+   def calculateSpacingOfPhonemeAndGlossTokens(self):
+
+      #phonemesTier = line0.getTable().loc[tbl['LINGUISTIC_TYPE_REF'] == "phonemic"]['TEXT']
+      #phonemeGlossesTier = line0.getTable().loc[tbl['LINGUISTIC_TYPE_REF'] == "translation"]['TEXT']
+      phonemesTierText = self.getTable().ix[1]['TEXT']
+      phonemeGlossesTierText = self.getTable().ix[3]['TEXT']
+      phonemes = phonemesTierText.split("\t")
+      phonemeGlosses = phonemeGlossesTierText.split("\t")
+      print(phonemes)
+      print(phonemeGlosses)
+      assert(len(phonemes) == len(phonemeGlosses))
+      for i in range(len(phonemes)):
+         phonemeSize = len(phonemes[i])
+         glossSize = len(phonemeGlosses[i])
+         self.phonemeSpacing.append(max(phonemeSize, glossSize) + 1)
+
+   #----------------------------------------------------------------------------------------------------
    def show(self):
 
       pprint(vars(self))
@@ -72,7 +99,8 @@ class Line:
 
      tierObj = self.getTable().ix[tierNumber].to_dict()
      phonemes = tierObj['TEXT'].split("\t")
-     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % len(p) for p in phonemes])
+     #styleString = "grid-template-columns: %s;" % ''.join(["%dch " % len(p) for p in phonemes])
+     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.phonemeSpacing])
      with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
         for phoneme in phonemes:
           with htmlDoc.tag("div", klass="phoneme-cell"):
@@ -84,7 +112,8 @@ class Line:
      tierObj = self.getTable().ix[tierNumber].to_dict()
      phonemeGlosses = tierObj['TEXT'].split("\t")
 
-     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % len(p) for p in phonemeGlosses])
+     #styleString = "grid-template-columns: %s;" % ''.join(["%dch " % len(p) for p in phonemeGlosses])
+     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.phonemeSpacing])
      with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
         for phonemeGloss in phonemeGlosses:
           with htmlDoc.tag("div", klass="phoneme-cell"):

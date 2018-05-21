@@ -22,12 +22,12 @@
         </ANNOTATION>
         <ANNOTATION>
             <ALIGNABLE_ANNOTATION ANNOTATION_ID="a2" TIME_SLOT_REF1="ts3" TIME_SLOT_REF2="ts4">
-                <ANNOTATION_VALUE>tiә   swatixwtәd   gwәl   tasbәsad   al   kwi   tuhakw  </ANNOTATION_VALUE>
+                <ANNOTATION_VALUE>tiʔəʔ swatixʷtəd gʷəl tasbəsad ʔal kwi tuhaʔkw  </ANNOTATION_VALUE>
             </ALIGNABLE_ANNOTATION>
         </ANNOTATION>
         <ANNOTATION>
             <ALIGNABLE_ANNOTATION ANNOTATION_ID="a3" TIME_SLOT_REF1="ts3" TIME_SLOT_REF2="ts4">
-                <ANNOTATION_VALUE>tuswadhadәx   tia   aciltalbixw     gwәsčal   kwi   gwәdәxwkwәdәxʷcәl   kwi   slәx̌il.</ANNOTATION_VALUE>
+                <ANNOTATION_VALUE>tusʷadhadәxʷ   tʔiəʔ   aciltalbixʷ     gwәsčal   kwi   gwәdәxwkwәdәxʷcәl   kwi   slәx̌il.</ANNOTATION_VALUE>
             </ALIGNABLE_ANNOTATION>
         </ANNOTATION>
         <ANNOTATION>
@@ -67,25 +67,25 @@
     <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="speech" TIER_ID="phonemicTranslation">
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a9" ANNOTATION_REF="a5">
-                <ANNOTATION_VALUE>in	remote	past	in	remote	past	long-ago	and	not	daylight</ANNOTATION_VALUE>
+                <ANNOTATION_VALUE>in	remote	past	in	remote	past-long-ago	and	not	daylight</ANNOTATION_VALUE>
             </REF_ANNOTATION>
         </ANNOTATION>
 
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a10" ANNOTATION_REF="a6">
-                <ANNOTATION_VALUE>this	land	and	remote-past	was-dark	in	remote	long-ago</ANNOTATION_VALUE>
+                <ANNOTATION_VALUE>this	land	and	was-dark	in	remote	long-ago</ANNOTATION_VALUE>
             </REF_ANNOTATION>
         </ANNOTATION>
 
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a11" ANNOTATION_REF="a7">
-                <ANNOTATION_VALUE>now-there-was-talk	this	people	how	uncertain-means-get	remote	daylight</ANNOTATION_VALUE>
+              <ANNOTATION_VALUE>now-there-was-talk	this	people	how-now	remote	uncertain-means-get	remote	daylight</ANNOTATION_VALUE>
             </REF_ANNOTATION>
         </ANNOTATION>
 
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a12" ANNOTATION_REF="a8">
-                <ANNOTATION_VALUE>that	remote	sunlight	in	remote	upriver-country	and	how	we-obtain</ANNOTATION_VALUE>
+                <ANNOTATION_VALUE>that	remote	sunlight	in	remote	upriver-country	and	how	remote	we-obtain</ANNOTATION_VALUE>
             </REF_ANNOTATION>
         </ANNOTATION>
 
