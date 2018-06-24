@@ -6,6 +6,7 @@ from yattag import *
 class Line:
 
    tierInfo = []
+   spokenTextID = ""
    rootElement = None
    tierElements = []
    doc = None
@@ -31,8 +32,10 @@ class Line:
        #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA', 'TIER_ID': 'ENG'},
        #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA2', 'TIER_ID': 'GL'}]
      self.tbl = buildTable(doc, self.allElements)
-     self.phonemeSpacing = [];
-     self.calculateSpacingOfPhonemeAndGlossTokens()
+     #self.deduceStructure()
+     #self.phonemeSpacing = [];
+     #self.calculateSpacingOfPhonemeAndGlossTokens()
+     
 
    def getTierCount(self):
        return(len(self.tierElements))
@@ -49,7 +52,7 @@ class Line:
      hasTokenizedText = False
      if(hasText):
         hasTokenizedText = tierInfo['TEXT'].find("\t") > 0
-     if((tierType == "default-lt") and (hasTimes)):
+     if((hasTimes)):
         return("spokenText")
      if(tierType == "phonemic" and hasTokenizedText):
         return("tokenizedWords")
@@ -61,10 +64,16 @@ class Line:
 
 
    #----------------------------------------------------------------------------------------------------
+   def deduceSpokenTextID(self):
+
+      return(self.tbl.loc[pd.isnull(self.tbl['ANNOTATION_REF'])]["ANNOTATION_ID"][0])
+
+   #----------------------------------------------------------------------------------------------------
    def calculateSpacingOfPhonemeAndGlossTokens(self):
 
       #phonemesTier = line0.getTable().loc[tbl['LINGUISTIC_TYPE_REF'] == "phonemic"]['TEXT']
       #phonemeGlossesTier = line0.getTable().loc[tbl['LINGUISTIC_TYPE_REF'] == "translation"]['TEXT']
+      import pdb; pdb.set_trace();
       phonemesTierText = self.getTable().ix[1]['TEXT']
       phonemeGlossesTierText = self.getTable().ix[3]['TEXT']
       phonemes = phonemesTierText.split("\t")
