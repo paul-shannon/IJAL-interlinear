@@ -1,0 +1,128 @@
+For context, here are your six tier types with some of my notes added:
+
+a) spokenText:      acharacter string, unstructured, time-aligned
+
+
+b) tokenizedWords:  structured, a list of N character strings,
+                  encoded via tabs in a single ANNOTATION element, or
+                  via multiple ANNOTATION elements implicitly grouped
+                  via a shared ANNOTATION_REF attribute pointing to
+                  the spokenText parent element
+
+c) tokenizedGlosses: structured, also of length N
+
+david: One way to cheat with b & c is that they tend to
+have n-dashes and equals signs marking morphological boundaries, and
+should have no whitespace on it. This would depend on people properly
+following formatting instructions, of course. But a global pass
+through the .eaf file identifying that have these symbols in them by
+name might be something to think about.
+
+
+d) freeTranslation: unstructured, tied to spokenText via an ANNOTATION_REF element,
+                  distinguished from a tokenizedWords element by its
+                  TIER_ID and LINGUISTIC_TYPE_REF (which are not from a controlled
+                  vocabulary)
+
+david: Obligatory. I think we might find this tier to be quite variable in
+terms of what it depends on and its LINGUISTIC_TYPE_REF, which could
+quite often be “default” or the same as (a).
+
+e) transcribedText (this would have potentially different uses,
+                  but would most often be a close phonetic
+                  transcription in addition to the orthographic
+                  transcription in the first line):  structured or unstructured (I assume the latter)
+
+david: Most likely unstructured. It would tend to look like (a) and (d),
+though we just got a text where it is used for some kind of technical
+representation
+
+f) secondFreeTranslation: unstructured
+
+Legal combinations:
+
+1) a + d (as in the first four lines of AYA1_MonkeyandThunder.eaf, in which
+   the story is introduced in Spanish, translated into English)
+2) a + b + c + d  (perhaps the most common usage)
+3) a + b + c + d + e and/or f
+
+4) just a   (maybe not of interest to IJAL, but perhaps for an early draft of a project?)
+
+If a text contains English lines, then just (a) is a good outcome.
+
+5) a + b?
+6) a + b + c?
+
+david: No, these wouldn’t ever appear. If you can parse it, you can translate it.
+
+b and c are necessarily structured, yes?
+
+Yes, though utterances with single monomorphemic words will occur.
+
+By tabs or child elements?
+
+They should appear as child elements in the .eaf file. I would’t
+expect tabs—MONKEY AND THUNDER is a surprise. But if we can handle
+tabs, it might be worth dealing with that proactively.
+
+Assuming so, this simple algorithm seems possible, in which everything needed can be deduced from the eaf document, without user input:
+ 1) Determine the tier which has ALIGNABLE_ANNOTATION elements
+ 2) Are structured tiers present?  If two, determine which is the parent tier (the native language)
+ 3) What are the remaining unstructured tiers?  Deduce their full hierarchy from their
+    PARENT_REF values.
+
+Here is a slightly divergent example from LOKONO_IJAL_2.  There are 3 structured tiers:
+
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="default-lt" TIER_ID="Orthographic represntation">
+      <ANNOTATION><ALIGNABLE_ANNOTATION ANNOTATION_ID="a23" TIME_SLOT_REF1="ts1" TIME_SLOT_REF2="ts2">
+              <ANNOTATION_VALUE>Bâmun koba tha aba loko hiyaro.</ANNOTATION_VALUE> </ALIGNABLE_ANNOTATION>
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="Translation" PARENT_REF="Orthographic represntation" TIER_ID="English translation">
+     <ANNOTATION><REF_ANNOTATION ANNOTATION_ID="a966" ANNOTATION_REF="a23">
+              <ANNOTATION_VALUE>‘You had once a Lokono woman, it is said.'</ANNOTATION_VALUE> </REF_ANNOTATION>
+    (six of these structured tokens (words) of which this is the last, all with parent a23, each with
+     two child references via "a12122")
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="word" PARENT_REF="Orthographic represntation" TIER_ID="Word division-cp">
+     <ANNOTATION><REF_ANNOTATION ANNOTATION_ID="a12122" ANNOTATION_REF="a23" PREVIOUS_ANNOTATION="a12121">
+              <ANNOTATION_VALUE>hiyaro</ANNOTATION_VALUE> </REF_ANNOTATION>
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="Morpheme" PARENT_REF="Word division-cp" TIER_ID="morpheme">
+     <ANNOTATION> <REF_ANNOTATION ANNOTATION_ID="a20521" ANNOTATION_REF="a12122">
+              <ANNOTATION_VALUE>hijaro</ANNOTATION_VALUE> </REF_ANNOTATION>
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="Morpheme" PARENT_REF="Word division-cp" TIER_ID="gloss">
+     <ANNOTATION><REF_ANNOTATION ANNOTATION_ID="a22378" ANNOTATION_REF="a12122">
+              <ANNOTATION_VALUE>woman</ANNOTATION_VALUE> </REF_ANNOTATION>
+
+Assuming so, this simple algorithm seems possible, in which everything
+needed can be deduced from the eaf document, without user input:
+
+ 1) Determine the tier which has ALIGNABLE_ANNOTATION elements
+ 2) Are structured tiers present?  If two, determine which is the parent tier (the native language)
+ 3) What are the remaining unstructured tiers?  Deduce their full hierarchy from their
+    PARENT_REF values.
+
+Here is a slightly divergent example from LOKONO_IJAL_2.  There are 3 structured tiers:
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="default-lt" TIER_ID="Orthographic represntation">
+      <ANNOTATION><ALIGNABLE_ANNOTATION ANNOTATION_ID="a23" TIME_SLOT_REF1="ts1" TIME_SLOT_REF2="ts2">
+              <ANNOTATION_VALUE>Bâmun koba tha aba loko hiyaro.</ANNOTATION_VALUE> </ALIGNABLE_ANNOTATION>
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="Translation" PARENT_REF="Orthographic represntation" TIER_ID="English translation">
+     <ANNOTATION><REF_ANNOTATION ANNOTATION_ID="a966" ANNOTATION_REF="a23">
+              <ANNOTATION_VALUE>‘You had once a Lokono woman, it is said.'</ANNOTATION_VALUE> </REF_ANNOTATION>
+    (six of these structured tokens (words) of which this is the last, all with parent a23, each with
+     two child references via "a12122")
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="word" PARENT_REF="Orthographic represntation" TIER_ID="Word division-cp">
+     <ANNOTATION><REF_ANNOTATION ANNOTATION_ID="a12122" ANNOTATION_REF="a23" PREVIOUS_ANNOTATION="a12121">
+              <ANNOTATION_VALUE>hiyaro</ANNOTATION_VALUE> </REF_ANNOTATION>
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="Morpheme" PARENT_REF="Word division-cp" TIER_ID="morpheme">
+     <ANNOTATION> <REF_ANNOTATION ANNOTATION_ID="a20521" ANNOTATION_REF="a12122">
+              <ANNOTATION_VALUE>hijaro</ANNOTATION_VALUE> </REF_ANNOTATION>
+  <TIER DEFAULT_LOCALE="en" LINGUISTIC_TYPE_REF="Morpheme" PARENT_REF="Word division-cp" TIER_ID="gloss">
+     <ANNOTATION><REF_ANNOTATION ANNOTATION_ID="a22378" ANNOTATION_REF="a12122">
+              <ANNOTATION_VALUE>woman</ANNOTATION_VALUE> </REF_ANNOTATION>
+
+david: LOKONO is also a deviation from the expected structure as I did
+   not expect a structured ‘word’ tier. In order to handle this, the
+   algorithm would have to now to ignore the ‘word’ tier in the output
+   but use it to link the “morpheme” and “gloss” tiers to the appropriate
+   annotation. This is where I’m not sure we can do things
+   automatically. Likewise, distinguishing between (e) and (f) line types
+   is going to be problematic, barring automatic language
+   recongition. Which I suppose these days is possible …

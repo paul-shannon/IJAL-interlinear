@@ -2,7 +2,16 @@ import pandas as pd
 from xml.etree import ElementTree as etree
 from pprint import pprint
 from yattag import *
+import pdb
 #------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 class Line:
 
    tierInfo = []
@@ -32,10 +41,14 @@ class Line:
        #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA', 'TIER_ID': 'ENG'},
        #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA2', 'TIER_ID': 'GL'}]
      self.tbl = buildTable(doc, self.allElements)
+     self.rootSpokenTextID = self.deduceSpokenTextID()
      #self.deduceStructure()
      #self.phonemeSpacing = [];
      #self.calculateSpacingOfPhonemeAndGlossTokens()
-     
+
+
+   def getImmediateChildrenOfRoot(self):
+      rootID = self.deduceSpokenTextID()
 
    def getTierCount(self):
        return(len(self.tierElements))
@@ -44,23 +57,38 @@ class Line:
      return(self.tbl)
 
    def classifyTier(self, tierNumber):
+
      assert(tierNumber < self.getTable().shape[0])
      tierInfo = self.getTable().ix[tierNumber].to_dict()
      tierType = tierInfo['LINGUISTIC_TYPE_REF']
      hasTimes = tierInfo['START'] >= 0 and tierInfo['END'] >= 0
-     hasText = tierInfo['TEXT'] != None
-     hasTokenizedText = False
-     if(hasText):
-        hasTokenizedText = tierInfo['TEXT'].find("\t") > 0
-     if((hasTimes)):
+     hasText = tierInfo['TEXT'] != ""
+     pdb.set_trace()
+     directChildElement = tierInfo["ANNOTATION_REF"] == self.rootSpokenTextID
+     hasChildren = any((self.tbl["ANNOTATION_REF"] == tierInfo["ANNOTATION_ID"]).tolist())
+     if(hasTimes):
         return("spokenText")
-     if(tierType == "phonemic" and hasTokenizedText):
-        return("tokenizedWords")
-     if(tierType == "translation" and hasTokenizedText):
-        return("tokenizedGlosses")
-     if(tierType == "translation" and hasText and not hasTokenizedText):
-        return("freeTranslation")
-     return ("unrecognized")
+     if(not hasText):
+        return("empty")
+     if(directChildElement):
+        if(hasChildren):
+           return("nativeMorpheme")
+        else:
+           return("nativeGlossOrFreeTranslation")
+     return("unrecognized")
+
+#     hasTokenizedText = False
+#     if(hasText):
+#        hasTokenizedText = tierInfo['TEXT'].find("\t") > 0
+#     if((hasTimes)):
+#        return("spokenText")
+#     if(tierType == "phonemic" and hasTokenizedText):
+#        return("tokenizedWords")
+#     if(tierType == "translation" and hasTokenizedText):
+#        return("tokenizedGlosses")
+#     if(tierType == "translation" and hasText and not hasTokenizedText):
+#        return("freeTranslation")
+#     return ("unrecognized")
 
 
    #----------------------------------------------------------------------------------------------------
@@ -214,6 +242,8 @@ def buildTable(doc, lineElements):
      tierInfo.append(tierAttributes)
      childPattern = "*/*/*/[@ANNOTATION_ID='%s']/ANNOTATION_VALUE" % id
      elementText = doc.find(childPattern).text
+     if(elementText is None):
+        elementText = ""
      #print("elementText: %s" % elementText)
      text.append(elementText)
 
@@ -237,6 +267,10 @@ def buildTable(doc, lineElements):
    preferredColumnOrder = ["ANNOTATION_ID", "LINGUISTIC_TYPE_REF", "START", "END", "TEXT", "ANNOTATION_REF", "TIME_SLOT_REF1", "TIME_SLOT_REF2",
                           "PARENT_REF", "TIER_ID"]
    tbl = tbl[preferredColumnOrder]
+   textLengths = [len(t) for t in tbl["TEXT"].tolist()]
+   tbl["TEXT_LENGTH"] = textLengths
+   hasTabs = ["\t" in t for t in tbl["TEXT"].tolist()]
+   tbl["HAS_TABS"] = hasTabs
 
    return(tbl)
 

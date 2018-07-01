@@ -3,7 +3,6 @@ import sys
 import unittest
 from Line import *
 import importlib
-import pdb
 
 
 def runTests():
@@ -19,6 +18,41 @@ def runTests():
     #test_tokenizedGlossesToHtml()
     #test_freeTranslationToHtml()
     # test_toHTML()
+
+def test_getTable_from_LOKONO():
+
+    print("--- test_getTable_from_LOKONO")
+    pd.set_option('display.width', 1000)
+    filename = "../testData/LOKONO_IJAL_2.eaf"
+    doc = etree.parse(filename)
+    x2 = Line(doc, 3)
+    tbl2 = x2.getTable()
+    assert(x2.classifyTier(0) == "spokenText")
+    assert(x2.classifyTier(1) == "nativeGlossOrFreeTranslation")
+    assert(x2.classifyTier(2) == "nativeMorpheme")
+
+
+
+def test_getTable_from_MonkeyAndThunder_line_0_spokenText_colonialLanguage():
+
+    print("--- test_getTable_from_MonkeyAndThunder_line_0_spokenText_colonialLanguage")
+    pd.set_option('display.width', 1000)
+    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+    doc = etree.parse(filename)
+    lineNumber = 0
+    x = Line(doc, lineNumber)
+    tbl = x.getTable()
+    assert(tbl.shape[0] == 4)
+    assert(tbl['TEXT_LENGTH'].tolist() == [39, 0, 50, 0])
+    assert(tbl['HAS_TABS'].tolist() == [False, False, False, False])
+        # skip the 0th, the root row, which therefore has no backpointer
+        # make sure that all the child tiers point back to an reference id
+    refIDs = tbl["ANNOTATION_ID"].tolist()
+    backPointers = tbl["ANNOTATION_REF"].tolist()[1:4]
+    assert([bp in refIDs for bp in backPointers] == [True, True, True])
+    assert(x.classifyTier(0) == "spokenText")
+    assert(x.classifyTier(1) == "empty")
+    assert(x.classifyTier(2) == "freeTranslation")
 
 
 def test_spokenTextID():
@@ -100,6 +134,17 @@ def test_spokenTextID():
     assert(len(uniqueIDs) == maxLinesToTest)
     line0 = Line(doc, 0)
     assert(line0.deduceSpokenTextID() == "a1")
+
+
+def dev():
+    filename = "../testData/LOKONO_IJAL_2.eaf"
+    doc = etree.parse(filename)
+    line0 = Line(doc, 0)
+    tbl = line0.getTable()
+
+    childIDs = tbl.loc[tbl["ANNOTATION_REF"]== "a23", "ANNOTATION_ID"].tolist()
+    childText = tbl.loc[tbl["ANNOTATION_REF"]== "a23", "TEXT"].tolist()
+    textLength = [len(t) for t in tbl["TEXT"].tolist()]
 
 
 def test_daylight_0():
