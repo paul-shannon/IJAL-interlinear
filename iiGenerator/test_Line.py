@@ -8,7 +8,7 @@ import pdb
 
 def runTests():
 
-    test_spokenTextID():
+    test_spokenTextID()
     #test_daylight_0()
     #test_daylight_1_4()
     #test_monkey_0()
@@ -23,70 +23,83 @@ def runTests():
 
 def test_spokenTextID():
 
+    """ the spokenTextID is the root identifier of each line,
+        providing the basis for linking all of the tiers in that lineElements
+    """
     print("--- test_deduceSpokenTextID")
 
     filename = "../testData/LOKONO_IJAL_2.eaf"
     doc = etree.parse(filename)
     lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-    for lineNumber in range(lineCount):
+    maxLinesToTest = 10
+    if(lineCount < maxLinesToTest):
+        max = lineCount
+    uniqueIDs = []
+    print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
+    for lineNumber in range(maxLinesToTest):
         x = Line(doc, lineNumber)
         rootID = x.deduceSpokenTextID()
-        print("%d: %s" % (lineNumber, rootID))
+        uniqueIDs.append(rootID)
+    assert(len(uniqueIDs) == maxLinesToTest)
 
 
     filename = "../testData/daylight_1_4.eaf"
     doc = etree.parse(filename)
     lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-    print("  --- checking %d rootElements (ALIGNABLE_ANNOTATION ids) in %s" % (lineCount, filename))
-    alreadySeen = []
-    for lineNumber in range(lineCount):
+    maxLinesToTest = 10
+    if(lineCount < maxLinesToTest):
+        maxLinesToTest = lineCount
+    uniqueIDs = []
+    print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
+
+    if(lineCount < maxLinesToTest):
+        maxLinesToTest = lineCount
+    for lineNumber in range(maxLinesToTest):
         x = Line(doc, lineNumber)
         rootID = x.deduceSpokenTextID()
-        assert(rootID not in alreadySeen)
-        alreadySeen.append(rootID)
+        assert(rootID not in uniqueIDs)
+        uniqueIDs.append(rootID)
         #print("%d: %s" % (lineNumber, rootID))
-    print("success with %d lines" % (lineNumber + 1))
+    assert(len(uniqueIDs) == maxLinesToTest)
     line0 = Line(doc, 0)
     assert(line0.deduceSpokenTextID() == "a1")
 
     filename = "../testData/daylight77a.eaf"
     doc = etree.parse(filename)
     lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-    print("  --- checking %d rootElements (ALIGNABLE_ANNOTATION ids) in %s" % (lineCount, filename))
-    alreadySeen = []
+    maxLinesToTest = 10
+    if(lineCount < maxLinesToTest):
+        maxLinesToTest = lineCount
+    uniqueIDs = []
+    print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
     for lineNumber in range(lineCount):
         x = Line(doc, lineNumber)
         rootID = x.deduceSpokenTextID()
-        assert(rootID not in alreadySeen)
-        alreadySeen.append(rootID)
+        assert(rootID not in uniqueIDs)
+        uniqueIDs.append(rootID)
         #print("%d: %s" % (lineNumber, rootID))
-    print("success with %d lines" % (lineNumber + 1))
+    assert(len(uniqueIDs) == maxLinesToTest)
+    line0 = Line(doc, 0)
+    assert(line0.deduceSpokenTextID() == "a1")
 
     filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
     doc = etree.parse(filename)
     lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-    print("  --- checking %d rootElements (ALIGNABLE_ANNOTATION ids) in %s" % (lineCount, filename))
-    alreadySeen = []
-    for lineNumber in range(lineCount):
-        x = Line(doc, lineNumber)
-        rootID = x.deduceSpokenTextID()
-        assert(rootID not in alreadySeen)
-        alreadySeen.append(rootID)
-        #print("%d: %s" % (lineNumber, rootID))
-    print("success with %d lines" % (lineNumber + 1))
+    uniqueIDs = []
+    maxLinesToTest = 10
+    if(lineCount < maxLinesToTest):
+        maxLinesToTest = lineCount
+    print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
 
-    filename = "../testData/LOKONO_IJAL_2.eaf" 
-    doc = etree.parse(filename)
-    lineCount = len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
-    print("  --- checking %d rootElements (ALIGNABLE_ANNOTATION ids) in %s" % (lineCount, filename))
-    alreadySeen = []
-    for lineNumber in range(lineCount):
+    for lineNumber in range(maxLinesToTest):
         x = Line(doc, lineNumber)
         rootID = x.deduceSpokenTextID()
-        assert(rootID not in alreadySeen)
-        alreadySeen.append(rootID)
+        assert(rootID not in uniqueIDs)
+        uniqueIDs.append(rootID)
         #print("%d: %s" % (lineNumber, rootID))
-    print("success with %d lines" % (lineNumber + 1))
+    assert(len(uniqueIDs) == maxLinesToTest)
+    line0 = Line(doc, 0)
+    assert(line0.deduceSpokenTextID() == "a1")
 
 
 def test_daylight_0():
@@ -169,19 +182,19 @@ def test_lokono_all(verbose=False):
     doc=etree.parse(filename)
     lineCount=len(doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
     assert(lineCount == 344)
-   for i in range(0):
-      line=Line(doc, i)
-   tbl=line.getTable()
-   tierTypes=list(tbl.ix[:, "LINGUISTIC_TYPE_REF"])
-   print(tierTypes)
-   # assert(tierTypes == ['default-lt', 'phonemic', 'translation', 'translation'])
-   lineText=line.getSpokenText()
-   # empirically derived.  lines have betwee 10 and 61 characters
-   assert(len(lineText) >= 10)
-   # empirically derived.  lines have betwee 10 and 61 characters
-   assert(len(lineText) < 100)
-   if(verbose):
-      print("%2d) %s" % (i, lineText))
+    for i in range(3):
+        line=Line(doc, i)
+        tbl=line.getTable()
+        tierTypes=list(tbl.ix[:, "LINGUISTIC_TYPE_REF"])
+        print(tierTypes)
+        # assert(tierTypes == ['default-lt', 'phonemic', 'translation', 'translation'])
+        lineText=line.getSpokenText()
+        # empirically derived.  lines have betwee 10 and 61 characters
+        assert(len(lineText) >= 10)
+        # empirically derived.  lines have betwee 10 and 61 characters
+        assert(len(lineText) < 100)
+    if(verbose):
+        print("%2d) %s" % (i, lineText))
 
 # ----------------------------------------------------------------------------------------------------
 # ijal eaf lines have tiers of six types, of which all but the first seem to be optional
