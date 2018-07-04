@@ -4,14 +4,6 @@ from pprint import pprint
 from yattag import *
 import pdb
 #------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
 class Line:
 
    tierInfo = []
@@ -42,6 +34,8 @@ class Line:
        #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA2', 'TIER_ID': 'GL'}]
      self.tbl = buildTable(doc, self.allElements)
      self.rootSpokenTextID = self.deduceSpokenTextID()
+     self.wordRepresentation = self.deduceWordRepresentation()
+
      #self.deduceStructure()
      #self.phonemeSpacing = [];
      #self.calculateSpacingOfPhonemeAndGlossTokens()
@@ -64,13 +58,19 @@ class Line:
      hasTimes = tierInfo['START'] >= 0 and tierInfo['END'] >= 0
      hasText = tierInfo['TEXT'] != ""
      pdb.set_trace()
-     directChildElement = tierInfo["ANNOTATION_REF"] == self.rootSpokenTextID
+         # the root is the full spoken text, a single string, in practical orthography
+         # is this tier a direct child of root?
+         #   1) the full (untokenized) translation
+         #   2) words, in one of (so far) two representations:
+         #       a) phonetic transcription: tab-delimited text, with a child tier of glosses
+         #       b) a set of direct children, each with 1 or 2 child elements of their own
+     directRootChildElement = tierInfo["ANNOTATION_REF"] == self.rootSpokenTextID
      hasChildren = any((self.tbl["ANNOTATION_REF"] == tierInfo["ANNOTATION_ID"]).tolist())
      if(hasTimes):
         return("spokenText")
      if(not hasText):
         return("empty")
-     if(directChildElement):
+     if(directRootChildElement):
         if(hasChildren):
            return("nativeMorpheme")
         else:
@@ -95,6 +95,42 @@ class Line:
    def deduceSpokenTextID(self):
 
       return(self.tbl.loc[pd.isnull(self.tbl['ANNOTATION_REF'])]["ANNOTATION_ID"][0])
+
+   #----------------------------------------------------------------------------------------------------
+   def deduceWordRepresentation(self):
+
+      rootSpokenTextID = self.deduceSpokenTextID()
+      numberOfDirectChildrenOfRoot = self.tbl.ix[self.tbl["ANNOTATION_REF"] == rootSpokenTextID].shape[0]
+         # add test for present but empty word tier, as in monkey line 1
+      if(numberOfDirectChildrenOfRoot == 1):
+         return("noWords")
+      elif(numberOfDirectChildrenOfRoot == 2):
+         return("tokenizedWords")
+      elif(numberOfDirectChildrenOfRoot > 2):
+         return("wordsDistributedInElements")
+      else:
+         print("unrecognized word representation")
+
+   #----------------------------------------------------------------------------------------------------
+   def getWordRepresentation(self):
+      return(self.wordRepresentation)
+
+   #----------------------------------------------------------------------------------------------------
+   def traverse(self):
+      """
+         assumes rootSpokenTextID and wordRepresentation have been figured out
+      """
+      rootID = self.rootSpokenTextID
+      self.spokenTextRow = self.tbl.ix[self.tbl["ANNOTATION_ID"] == rootID].index[0]
+      tbl = self.tbl  # allows more compact expressions
+
+       # "noWords"   "tokenizedWords"  "wordsDistributedInElements"
+      if(self.wordRepresentation == "noWords"):
+         self.freeTranslationRow == self.tbl.ix[self.tbl["ANNOTATION_REF"] == rootID].index[0]
+      elif(self.wordRepresentation == "tokenizedWords"):
+         self.freeTranslationRow = tbl[(tbl.HAS_TABS == False) & (tbl.ANNOTATION_REF == self.rootSpokenTextID)].index.tolist()[0]
+      elif(self.wordRepresentation == "wordsDistributedInElements"):
+         self.freeTranslationRow = tbl[(tbl.HAS_SPACES == True) & (tbl.ANNOTATION_REF == self.rootSpokenTextID)].index.tolist()[0]
 
    #----------------------------------------------------------------------------------------------------
    def calculateSpacingOfPhonemeAndGlossTokens(self):
@@ -271,6 +307,8 @@ def buildTable(doc, lineElements):
    tbl["TEXT_LENGTH"] = textLengths
    hasTabs = ["\t" in t for t in tbl["TEXT"].tolist()]
    tbl["HAS_TABS"] = hasTabs
+   hasSpaces = [" " in t for t in tbl["TEXT"].tolist()]
+   tbl["HAS_SPACES"] = hasSpaces
 
    return(tbl)
 

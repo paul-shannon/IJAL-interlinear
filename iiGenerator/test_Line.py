@@ -3,11 +3,14 @@ import sys
 import unittest
 from Line import *
 import importlib
+pd.set_option('display.width', 1000)
 
 
 def runTests():
 
     test_spokenTextID()
+    test_deduceWordRepresentation()
+    test_traverse()
     #test_daylight_0()
     #test_daylight_1_4()
     #test_monkey_0()
@@ -18,6 +21,26 @@ def runTests():
     #test_tokenizedGlossesToHtml()
     #test_freeTranslationToHtml()
     # test_toHTML()
+
+def showVariedTables():
+
+    pd.set_option('display.width', 1000)
+
+    filename = "../testData/LOKONO_IJAL_2.eaf"
+    doc = etree.parse(filename)
+    x3 = Line(doc, 3)
+    print(x3.getTable())
+
+    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+    doc = etree.parse(filename)
+    x6 = Line(doc, 6)
+    print(x6.getTable())
+
+    filename = "../testData/daylight_1_4.eaf"
+    doc = etree.parse(filename)
+    x1 = Line(doc, 1)
+    print(x1.getTable())
+
 
 def test_getTable_from_LOKONO():
 
@@ -30,8 +53,6 @@ def test_getTable_from_LOKONO():
     assert(x2.classifyTier(0) == "spokenText")
     assert(x2.classifyTier(1) == "nativeGlossOrFreeTranslation")
     assert(x2.classifyTier(2) == "nativeMorpheme")
-
-
 
 def test_getTable_from_MonkeyAndThunder_line_0_spokenText_colonialLanguage():
 
@@ -58,7 +79,7 @@ def test_getTable_from_MonkeyAndThunder_line_0_spokenText_colonialLanguage():
 def test_spokenTextID():
 
     """ the spokenTextID is the root identifier of each line,
-        providing the basis for linking all of the tiers in that lineElements
+        providing the basis for linking all of the tiers in that line's elements
     """
     print("--- test_deduceSpokenTextID")
 
@@ -69,13 +90,12 @@ def test_spokenTextID():
     if(lineCount < maxLinesToTest):
         max = lineCount
     uniqueIDs = []
-    print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
+    # print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
     for lineNumber in range(maxLinesToTest):
         x = Line(doc, lineNumber)
         rootID = x.deduceSpokenTextID()
         uniqueIDs.append(rootID)
     assert(len(uniqueIDs) == maxLinesToTest)
-
 
     filename = "../testData/daylight_1_4.eaf"
     doc = etree.parse(filename)
@@ -84,7 +104,7 @@ def test_spokenTextID():
     if(lineCount < maxLinesToTest):
         maxLinesToTest = lineCount
     uniqueIDs = []
-    print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
+    #print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
 
     if(lineCount < maxLinesToTest):
         maxLinesToTest = lineCount
@@ -105,7 +125,7 @@ def test_spokenTextID():
     if(lineCount < maxLinesToTest):
         maxLinesToTest = lineCount
     uniqueIDs = []
-    print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
+    #print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
     for lineNumber in range(lineCount):
         x = Line(doc, lineNumber)
         rootID = x.deduceSpokenTextID()
@@ -123,7 +143,7 @@ def test_spokenTextID():
     maxLinesToTest = 10
     if(lineCount < maxLinesToTest):
         maxLinesToTest = lineCount
-    print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
+    #print("testing %d/%d lines from %s" % (maxLinesToTest, lineCount,filename))
 
     for lineNumber in range(maxLinesToTest):
         x = Line(doc, lineNumber)
@@ -134,6 +154,62 @@ def test_spokenTextID():
     assert(len(uniqueIDs) == maxLinesToTest)
     line0 = Line(doc, 0)
     assert(line0.deduceSpokenTextID() == "a1")
+
+def test_deduceWordRepresentation():
+
+    print("--- test_deduceWordRepresentation")
+
+    filename = "../testData/LOKONO_IJAL_2.eaf"
+    doc = etree.parse(filename)
+    x3 = Line(doc, 3)
+    assert(x3.getWordRepresentation() == "wordsDistributedInElements")
+
+    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+    doc = etree.parse(filename)
+    x6 = Line(doc, 6)
+    assert(x6.getWordRepresentation() == "tokenizedWords")
+
+    filename = "../testData/daylight_1_4.eaf"
+    doc = etree.parse(filename)
+    x1 = Line(doc, 1)
+    assert(x1.getWordRepresentation() == "tokenizedWords")
+
+def test_traverse():
+    filename = "../testData/LOKONO_IJAL_2.eaf"
+    doc = etree.parse(filename)
+    x3 = Line(doc, 3)
+    print(x3.getTable())
+    x3.wordRepresentation
+    x3.traverse()
+    assert(x3.spokenTextRow == 0)
+    assert(x3.freeTranslationRow == 1)
+
+    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+    doc = etree.parse(filename)
+    x1 = Line(doc, 1)
+    print(x1.getTable())
+    x1.wordRepresentation
+    x1.traverse()
+    # not working yet.  must accomodate word line which though present is emtpy, 0 characters
+    #assert(x1.spokenTextRow == 0)
+    #assert(x1.freeTranslationRow == 2)
+
+    x6 = Line(doc, 6)
+    print(x6.getTable())
+    assert(x6.wordRepresentation == "tokenizedWords")
+    x6.traverse()
+    assert(x6.spokenTextRow == 0)
+    assert(x6.freeTranslationRow == 2)
+
+
+    filename = "../testData/daylight_1_4.eaf"
+    doc = etree.parse(filename)
+    x1 = Line(doc, 1)
+    print(x1.getTable())
+    x1.wordRepresentation
+    x1.traverse()
+    assert(x1.spokenTextRow == 0)
+    assert(x1.freeTranslationRow == 2)
 
 
 def dev():
