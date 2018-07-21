@@ -10,7 +10,7 @@ def runTests():
 
     test_spokenTextID()
     test_deduceWordRepresentation()
-    test_traverse()
+    test_traverseAndClassify()
     #test_daylight_0()
     #test_daylight_1_4()
     #test_monkey_0()
@@ -48,11 +48,12 @@ def test_getTable_from_LOKONO():
     pd.set_option('display.width', 1000)
     filename = "../testData/LOKONO_IJAL_2.eaf"
     doc = etree.parse(filename)
-    x2 = Line(doc, 3)
-    tbl2 = x2.getTable()
-    assert(x2.classifyTier(0) == "spokenText")
-    assert(x2.classifyTier(1) == "nativeGlossOrFreeTranslation")
-    assert(x2.classifyTier(2) == "nativeMorpheme")
+
+    x3 = Line(doc, 3)
+    tbl3 = x3.getTable()
+    assert(x3.classifyTier(0) == "spokenText")
+    assert(x3.classifyTier(1) == "nativeGlossOrFreeTranslation")
+    assert(x3.classifyTier(2) == "nativeMorpheme")
 
 def test_getTable_from_MonkeyAndThunder_line_0_spokenText_colonialLanguage():
 
@@ -73,7 +74,7 @@ def test_getTable_from_MonkeyAndThunder_line_0_spokenText_colonialLanguage():
     assert([bp in refIDs for bp in backPointers] == [True, True, True])
     assert(x.classifyTier(0) == "spokenText")
     assert(x.classifyTier(1) == "empty")
-    assert(x.classifyTier(2) == "freeTranslation")
+    assert(x.classifyTier(2) == "nativeGlossOrFreeTranslation")
 
 
 def test_spokenTextID():
@@ -81,7 +82,7 @@ def test_spokenTextID():
     """ the spokenTextID is the root identifier of each line,
         providing the basis for linking all of the tiers in that line's elements
     """
-    print("--- test_deduceSpokenTextID")
+    print("--- test_spokenTextID")
 
     filename = "../testData/LOKONO_IJAL_2.eaf"
     doc = etree.parse(filename)
@@ -174,30 +175,34 @@ def test_deduceWordRepresentation():
     x1 = Line(doc, 1)
     assert(x1.getWordRepresentation() == "tokenizedWords")
 
-def test_traverse():
+def test_traverseAndClassify():
+
+    print("--- test_traverseAndClassify")
     filename = "../testData/LOKONO_IJAL_2.eaf"
     doc = etree.parse(filename)
     x3 = Line(doc, 3)
     print(x3.getTable())
-    x3.wordRepresentation
-    x3.traverse()
+    assert(x3.wordRepresentation == "wordsDistributedInElements")
+     # x3.traverseAndClassify()
     assert(x3.spokenTextRow == 0)
     assert(x3.freeTranslationRow == 1)
 
     filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
     doc = etree.parse(filename)
-    x1 = Line(doc, 1)
-    print(x1.getTable())
-    x1.wordRepresentation
-    x1.traverse()
-    # not working yet.  must accomodate word line which though present is emtpy, 0 characters
-    #assert(x1.spokenTextRow == 0)
-    #assert(x1.freeTranslationRow == 2)
+    x0 = Line(doc, 0)
+    assert(x0.getTable().shape == (2,13))
+    x8 = Line(doc, 8)
+    print(x8.getTable())
+    assert(x8.getTable().shape == (4,13))
+    assert(x8.wordRepresentation == "tokenizedWords")
+     # x8.traverseAndClassify()
+    assert(x8.spokenTextRow == 0)
+    assert(x8.freeTranslationRow == 2)
 
     x6 = Line(doc, 6)
     print(x6.getTable())
     assert(x6.wordRepresentation == "tokenizedWords")
-    x6.traverse()
+     # x6.traverseAndClassify()
     assert(x6.spokenTextRow == 0)
     assert(x6.freeTranslationRow == 2)
 
@@ -206,8 +211,8 @@ def test_traverse():
     doc = etree.parse(filename)
     x1 = Line(doc, 1)
     print(x1.getTable())
-    x1.wordRepresentation
-    x1.traverse()
+    assert(x1.wordRepresentation == "tokenizedWords")
+     # x1.traverseAndClassify()
     assert(x1.spokenTextRow == 0)
     assert(x1.freeTranslationRow == 2)
 
@@ -361,8 +366,9 @@ def test_spokenTextToHtml():
    tierCount=line6.getTable().shape[0]
    assert(tierCount == 4)
    assert(line6.classifyTier(0) == "spokenText")
-   htmlDoc=Doc()
-   line6.spokenTextToHtml(htmlDoc, 0, 99)
+    # line6.traverseAndClassify()
+   htmlDoc = Doc()
+   line6.spokenTextToHtml(htmlDoc, 0)
    assert(htmlDoc.getvalue() ==
           '<div class="speech-tier">Ke jejn makput. Makndüj mbeʹ ii maknhwej maj.</div>')
 

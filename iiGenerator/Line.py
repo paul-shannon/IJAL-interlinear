@@ -19,12 +19,12 @@ class Line:
       #              gʷә-s-čal
       #              uncertain-means-get
       # this next member variable holds these values once calculated
-   phonemeSpacing = []
+   wordSpacing = []
 
    def __init__(self, doc, lineNumber):
      self.doc = doc
      self.lineNumber = lineNumber
-     self.rootElement = doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
+     self.rootElement = self.doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
      self.allElements = findChildren(self.doc, self.rootElement)
        # need tier info to guide traverse
      self.tierInfo = [doc.attrib for doc in doc.findall("TIER")]
@@ -35,10 +35,16 @@ class Line:
      self.tbl = buildTable(doc, self.allElements)
      self.rootSpokenTextID = self.deduceSpokenTextID()
      self.wordRepresentation = self.deduceWordRepresentation()
-
+     self.traverseAndClassify()
+     self.words = []
+     self.glosses = []
+     self.extractWords()
+     self.wordSpacing = []
+     if(len(self.words) > 0):
+        self.wordSpacing = [10 for x in range(len(self.words))]
      #self.deduceStructure()
-     #self.phonemeSpacing = [];
-     #self.calculateSpacingOfPhonemeAndGlossTokens()
+     #self.wordSpacing = [];
+     #self.calculateSpacingOfWordsAndTheirGlosses()
 
 
    def getImmediateChildrenOfRoot(self):
@@ -57,7 +63,7 @@ class Line:
      tierType = tierInfo['LINGUISTIC_TYPE_REF']
      hasTimes = tierInfo['START'] >= 0 and tierInfo['END'] >= 0
      hasText = tierInfo['TEXT'] != ""
-     pdb.set_trace()
+     # pdb.set_trace()
          # the root is the full spoken text, a single string, in practical orthography
          # is this tier a direct child of root?
          #   1) the full (untokenized) translation
@@ -66,16 +72,16 @@ class Line:
          #       b) a set of direct children, each with 1 or 2 child elements of their own
      directRootChildElement = tierInfo["ANNOTATION_REF"] == self.rootSpokenTextID
      hasChildren = any((self.tbl["ANNOTATION_REF"] == tierInfo["ANNOTATION_ID"]).tolist())
+     #pdb.set_trace()
      if(hasTimes):
         return("spokenText")
      if(not hasText):
         return("empty")
-     if(directRootChildElement):
-        if(hasChildren):
-           return("nativeMorpheme")
-        else:
-           return("nativeGlossOrFreeTranslation")
-     return("unrecognized")
+     if(directRootChildElement and hasChildren):
+        return("nativeMorpheme")
+     if(not directRootChildElement and not hasChildren):
+        return("nativeGlossOrFreeTranslation")
+     return("freeTranslation")
 
 #     hasTokenizedText = False
 #     if(hasText):
@@ -100,7 +106,9 @@ class Line:
    def deduceWordRepresentation(self):
 
       rootSpokenTextID = self.deduceSpokenTextID()
-      numberOfDirectChildrenOfRoot = self.tbl.ix[self.tbl["ANNOTATION_REF"] == rootSpokenTextID].shape[0]
+      tbl_emptyLinesRemoved = self.tbl.query("TEXT != ''")
+         # do not wish to count children with empty text fields
+      numberOfDirectChildrenOfRoot = tbl_emptyLinesRemoved.ix[self.tbl["ANNOTATION_REF"] == rootSpokenTextID].shape[0]
          # add test for present but empty word tier, as in monkey line 1
       if(numberOfDirectChildrenOfRoot == 1):
          return("noWords")
@@ -116,19 +124,26 @@ class Line:
       return(self.wordRepresentation)
 
    #----------------------------------------------------------------------------------------------------
-   def traverse(self):
+   def traverseAndClassify(self):
       """
          assumes rootSpokenTextID and wordRepresentation have been figured out
+         at present, this method only identifies and assigns the freeTranslationRow
       """
       rootID = self.rootSpokenTextID
       self.spokenTextRow = self.tbl.ix[self.tbl["ANNOTATION_ID"] == rootID].index[0]
       tbl = self.tbl  # allows more compact expressions
-
+      self.wordRows = None
+      #pdb.set_trace()
        # "noWords"   "tokenizedWords"  "wordsDistributedInElements"
       if(self.wordRepresentation == "noWords"):
-         self.freeTranslationRow == self.tbl.ix[self.tbl["ANNOTATION_REF"] == rootID].index[0]
+         self.freeTranslationRow = self.tbl.ix[self.tbl["ANNOTATION_REF"] == rootID].index[0]
       elif(self.wordRepresentation == "tokenizedWords"):
          self.freeTranslationRow = tbl[(tbl.HAS_TABS == False) & (tbl.ANNOTATION_REF == self.rootSpokenTextID)].index.tolist()[0]
+         wordRow = tbl[(tbl.ANNOTATION_REF == rootID) & tbl.HAS_TABS].index.tolist()[0]
+         wordRowID = tbl.ix[wordRow, 'ANNOTATION_ID']
+         glossRow = tbl[tbl.ANNOTATION_REF == wordRowID].index.tolist()[0]
+         self.glossRows = [glossRow]
+         self.wordRows = [wordRow]
       elif(self.wordRepresentation == "wordsDistributedInElements"):
          self.freeTranslationRow = tbl[(tbl.HAS_SPACES == True) & (tbl.ANNOTATION_REF == self.rootSpokenTextID)].index.tolist()[0]
 
@@ -137,7 +152,7 @@ class Line:
 
       #phonemesTier = line0.getTable().loc[tbl['LINGUISTIC_TYPE_REF'] == "phonemic"]['TEXT']
       #phonemeGlossesTier = line0.getTable().loc[tbl['LINGUISTIC_TYPE_REF'] == "translation"]['TEXT']
-      import pdb; pdb.set_trace();
+      # import pdb; pdb.set_trace();
       phonemesTierText = self.getTable().ix[1]['TEXT']
       phonemeGlossesTierText = self.getTable().ix[3]['TEXT']
       phonemes = phonemesTierText.split("\t")
@@ -160,42 +175,60 @@ class Line:
      return(self.tbl.ix[0, "TEXT"])
 
    #----------------------------------------------------------------------------------------------------
-   def spokenTextToHtml(self, htmlDoc, tierNumber): # , lineNumber):
+   def extractWords(self):
 
-     tierObj = self.getTable().ix[tierNumber].to_dict()
+     tokens = []
+     if(self.wordRepresentation == "tokenizedWords"):
+        self.words = self.tbl.ix[self.wordRows[0], "TEXT"].split("\t")
+        self.glosses = self.tbl.ix[self.glossRows[0], "TEXT"].split("\t")
+
+     if(self.wordRepresentation == "wordsDistributedInElements"):
+        tokens = ["not", "figured", "out", "yet"]
+
+     return(tokens)
+
+   #----------------------------------------------------------------------------------------------------
+   def spokenTextToHtml(self, htmlDoc):
+
+     spokenTextTier = self.spokenTextRow
+
+     tierObj = self.getTable().ix[spokenTextTier].to_dict()
      speechText = tierObj['TEXT']
      with htmlDoc.tag("div", klass="speech-tier"):
         htmlDoc.text(speechText)
 
    #----------------------------------------------------------------------------------------------------
-   def tokenizedWordsToHtml(self, htmlDoc, tierNumber):
+   def wordsToHtml(self, htmlDoc):
 
-     tierObj = self.getTable().ix[tierNumber].to_dict()
-     phonemes = tierObj['TEXT'].split("\t")
+     #tierNumber = self.wordRows[0]
+     #tierObj = self.getTable().ix[tierNumber].to_dict()
+     #phonemes = tierObj['TEXT'].split("\t")
      #styleString = "grid-template-columns: %s;" % ''.join(["%dch " % len(p) for p in phonemes])
-     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.phonemeSpacing])
+     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.wordSpacing])
      with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
-        for phoneme in phonemes:
+        for word in self.words:
           with htmlDoc.tag("div", klass="phoneme-cell"):
-             htmlDoc.text(phoneme)
+             htmlDoc.text(word)
 
    #----------------------------------------------------------------------------------------------------
-   def tokenizedGlossesToHtml(self, htmlDoc, tierNumber):
+   def glossesToHtml(self, htmlDoc):
 
-     tierObj = self.getTable().ix[tierNumber].to_dict()
-     phonemeGlosses = tierObj['TEXT'].split("\t")
+     #tierObj = self.getTable().ix[tierNumber].to_dict()
+     #phonemeGlosses = tierObj['TEXT'].split("\t")
 
      #styleString = "grid-template-columns: %s;" % ''.join(["%dch " % len(p) for p in phonemeGlosses])
-     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.phonemeSpacing])
+     styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.wordSpacing])
      with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
-        for phonemeGloss in phonemeGlosses:
+        for gloss in self.glosses:
           with htmlDoc.tag("div", klass="phoneme-cell"):
-             htmlDoc.text(phonemeGloss)
+             htmlDoc.text(gloss)
 
    #----------------------------------------------------------------------------------------------------
-   def freeTranslationToHtml(self, htmlDoc, tierNumber):
+   def freeTranslationToHtml(self, htmlDoc):
 
-     tierObj = self.getTable().ix[tierNumber].to_dict()
+     freeTranslationTier = self.freeTranslationRow
+
+     tierObj = self.getTable().ix[freeTranslationTier].to_dict()
      speechText = tierObj['TEXT']
      with htmlDoc.tag("div", klass="freeTranslation-tier"):
         htmlDoc.text(speechText)
@@ -250,6 +283,7 @@ def buildTable(doc, lineElements):
    tbl_elements = pd.DataFrame(e.attrib for e in lineElements)
    #print(tbl_elements)
 
+   #pdb.set_trace()
    startTimeSlotID = tbl_elements.ix[0, 'TIME_SLOT_REF1']
    pattern = "TIME_ORDER/TIME_SLOT[@TIME_SLOT_ID='%s']" % startTimeSlotID
    startTime = int(doc.find(pattern).attrib["TIME_VALUE"])
@@ -309,7 +343,9 @@ def buildTable(doc, lineElements):
    tbl["HAS_TABS"] = hasTabs
    hasSpaces = [" " in t for t in tbl["TEXT"].tolist()]
    tbl["HAS_SPACES"] = hasSpaces
-
+      # eliminate rows with no text
+      # leave it in for now, take the tiers at face value, handle empty lines in toHTML
+   tbl = tbl.query("TEXT != ''").reset_index(drop=True)
    return(tbl)
 
 #------------------------------------------------------------------------------------------------------------------------
