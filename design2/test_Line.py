@@ -3,6 +3,7 @@ import sys
 import unittest
 from Line import *
 import importlib
+import os
 pd.set_option('display.width', 1000)
 
 
@@ -28,3 +29,18 @@ def showVariedTables():
     doc = etree.parse(filename)
     x1 = Line(doc, 1)
     print(x1.getTable())
+
+def test_extractAudio():
+
+    print("--- test_extractAudio")
+    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+    xmlDoc = etree.parse(filename)
+    soundFileElement = xmlDoc.findall("HEADER/MEDIA_DESCRIPTOR")[0]
+    attributes = list(soundFileElement.attrib.keys())
+    assert("RELATIVE_MEDIA_URL" in attributes))
+    soundFileURI = soundFileElement[0].attrib["RELATIVE_MEDIA_URL"]
+    directory = os.path.dirname(os.path.abspath(filename))
+    fullPath = os.path.join(directory, soundFileURI)
+    assert(os.path.exists(fullPath))
+
+

@@ -15,6 +15,7 @@ class Line:
    tierElements = []
    doc = None
    lineNumber = None
+   soundFile = None
 
    def __init__(self, doc, lineNumber):
      self.doc = doc
@@ -94,6 +95,8 @@ def findChildren(doc, rootElement):
          elementsToDo.extend(childElements)
 
    return(elementsCompleted)
+
+def extractAudio(doc, rootElement, masterAudioFile):
 
 #------------------------------------------------------------------------------------------------------------------------
 def buildTable(doc, lineElements):
