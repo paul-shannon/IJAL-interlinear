@@ -21,16 +21,26 @@ with htmlDoc.tag('html', lang="en"):
      with htmlDoc.tag('head'):
          htmlDoc.asis('<meta charset="UTF-8">')
          htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
+         htmlDoc.asis('<script>')
+         htmlDoc.asis('function playSample(audioID){console.log(audioID); document.getElementById(audioID).play();}')
+         htmlDoc.asis('</script>')
          with htmlDoc.tag('body'):
              for i in range(lineCount):
                  x = Line(xmlDoc, i)
                  with htmlDoc.tag("div",  klass="line-wrapper"):
-                     with htmlDoc.tag("div", klass="line-sidebar"):
-                         htmlDoc.text("%d)" % (i + 1))
-                         htmlDoc.asis('<img src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"></img>')
-                     classifier = LineClassifier(x.getTable())
+                     tbl = x.getTable()
+                     lineID = tbl.ix[0]['ANNOTATION_ID']
+                     classifier = LineClassifier(tbl)
                      classification = classifier.run()
                      print("%d: %s" % (i, classification))
+                     with htmlDoc.tag("div", klass="line-sidebar"):
+                         htmlDoc.text("%d)" % (i + 1))
+                         audioTag = '<audio id="%s"><source src="monkeyTest/%s.wav"/></audio>' % (lineID, lineID)
+                         #print(audioTag)
+                         htmlDoc.asis(audioTag)
+                         buttonTag = '<button onclick="playSample(\'%s\')"><img src="https://www.americanlinguistics.org/wp-content/uploads/speaker.png"/></button>' % lineID
+                         #print(buttonTag)
+                         htmlDoc.asis(buttonTag)
                      if(classification == "CanonicalLine"):
                          xc = CanonicalLine(xmlDoc, i)
                          xc.toHtml(htmlDoc)
@@ -46,6 +56,3 @@ f = open(filename, "w")
 f.write(indent(htmlText))
 f.close()
 os.system("open %s" % filename)
-
-
-

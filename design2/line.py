@@ -96,8 +96,6 @@ def findChildren(doc, rootElement):
 
    return(elementsCompleted)
 
-def extractAudio(doc, rootElement, masterAudioFile):
-
 #------------------------------------------------------------------------------------------------------------------------
 def buildTable(doc, lineElements):
 
