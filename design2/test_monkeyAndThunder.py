@@ -35,7 +35,7 @@ with htmlDoc.tag('html', lang="en"):
                      classification = classifier.run()
                      print("%d: %s" % (i, classification))
                      with htmlDoc.tag("div", klass="line-sidebar"):
-                         lineLeadIn(htmlDoc, i, lineID, audioDirectory)
+                         x.htmlLeadIn(htmlDoc, audioDirectory)
                      if(classification == "CanonicalLine"):
                          xc = CanonicalLine(xmlDoc, i)
                          xc.toHtml(htmlDoc)
