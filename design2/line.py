@@ -183,16 +183,3 @@ def buildTable(doc, lineElements):
    return(tbl)
 
 #------------------------------------------------------------------------------------------------------------------------
-def lineLeadIn(htmlDoc, lineNumber, lineID, audioDirectory):
-
-    oneBasedLineNumber = lineNumber + 1
-    text = "%d)" % oneBasedLineNumber
-    htmlDoc.text(text)
-    audioTag = '<audio id="%s"><source src="%s/%s.wav"/></audio>' % (lineID, audioDirectory, lineID)
-    htmlDoc.asis(audioTag)
-    imageURL = "https://www.americanlinguistics.org/wp-content/uploads/speaker.png"
-    buttonTag = '<button onclick="playSample(\'%s\')"><img src=\'%s\'/></button>' % (lineID, imageURL)
-    htmlDoc.asis(buttonTag)
-
-#------------------------------------------------------------------------------------------------------------------------
-

@@ -33,7 +33,7 @@ with htmlDoc.tag('html', lang="en"):
                      lineID = tbl.ix[0]['ANNOTATION_ID']
                      classifier = LineClassifier(tbl)
                      classification = classifier.run()
-                     print("%d: %s" % (i, classification))
+                     print("%3d: %s" % (i, classification))
                      with htmlDoc.tag("div", klass="line-sidebar"):
                          x.htmlLeadIn(htmlDoc, audioDirectory)
                      if(classification == "CanonicalLine"):
