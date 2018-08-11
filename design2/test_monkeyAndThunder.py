@@ -1,5 +1,6 @@
 import re
 import sys
+import os
 import unittest
 from line import *
 from canonicalLine import *
@@ -21,9 +22,10 @@ with htmlDoc.tag('html', lang="en"):
      with htmlDoc.tag('head'):
          htmlDoc.asis('<meta charset="UTF-8">')
          htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
-         htmlDoc.asis('<script>')
-         htmlDoc.asis('function playSample(audioID){console.log(audioID); document.getElementById(audioID).play();}')
-         htmlDoc.asis('</script>')
+         htmlDoc.asis('<script src="ijalUtils.js"></script>')
+#         htmlDoc.asis('<script>')
+#         htmlDoc.asis('function playSample(audioID){console.log(audioID); document.getElementById(audioID).play();}')
+#         htmlDoc.asis('</script>')
          with htmlDoc.tag('body'):
              for i in range(lineCount):
                  x = Line(xmlDoc, i)
@@ -51,7 +53,7 @@ with htmlDoc.tag('html', lang="en"):
 
 htmlText = htmlDoc.getvalue()
 
-filename = "monkeyAndThunder.html"
+filename = "monkeyAndThunder2.html"
 f = open(filename, "w")
 f.write(indent(htmlText))
 f.close()
