@@ -46,7 +46,7 @@ with htmlDoc.tag('html', lang="en"):
 
 htmlText = htmlDoc.getvalue()
 
-filename = "monkeyAndThunder2.html"
+filename = "monkeyAndThunder.html"
 f = open(filename, "w")
 f.write(indent(htmlText))
 f.close()
