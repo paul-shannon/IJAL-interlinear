@@ -52,6 +52,12 @@ class MorphemeGloss:
    def getParts(self):
       return(self.parts)
 
+   def toHTML(self);
+      """ iterate over the parts list, idenitfy each grammaticalTerm
+          wrap each of those in a <span class='grammticalTerm'> tag
+      """
+      return("nothing yet")
+
 
 #------------------------------------------------------------------------------------------------------------------------
 # non-class functions
