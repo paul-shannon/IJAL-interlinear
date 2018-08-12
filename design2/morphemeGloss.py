@@ -1,11 +1,12 @@
-# MorphemeGloss.py: a class with which to capture, and rending into HTML, the morphemes of the spoken text, using
-# standard grammatical terms:
+# MorphemeGloss.py: a class to capture, and render into HTML, the morphemes of the spoken text, using
+# standard grammatical terms
+#
+#  from https://en.wikipedia.org/wiki/Interlinear_gloss#Structure
 #
 #  grammatical terms are commonly abbreviated and printed in SMALL CAPITALS to keep them distinct
-#  from translations, #  especially when they are frequent or important for analysis.
-#      [see https://en.wikipedia.org/wiki/Interlinear_gloss#Structure]
+#  from translations,  especially when they are frequent or important for analysis.
 #
-# see the Leipzig Glossing Rules: https://www.eva.mpg.de/lingua/resources/glossing-rules.php
+# alos see the Leipzig Glossing Rules: https://www.eva.mpg.de/lingua/resources/glossing-rules.php
 #
 # in interlienar morphological glosses, punctuation separate the glosses:
 #
@@ -14,6 +15,7 @@
 #        =  separates clitics (a morpheme with syntactic characteristics of a word, but which
 #           depends phonologically upon another word or phrase)
 #        ~  reduplication
+#        - and more...
 #
 # david beck (email 12 aug 2018):
 #
@@ -35,7 +37,7 @@ class MorphemeGloss:
 
    rawText = ""
    grammaticalTerms = []
-   delimiters = "([=•\d\.–])"
+   delimiters = "([=•\d\.–~])"   # more to come: ^ < >, subscripts recognition?
 
    def __init__(self, rawText, grammaticalTerms):
      self.rawText = rawText
