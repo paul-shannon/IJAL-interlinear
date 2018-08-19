@@ -1,12 +1,12 @@
 # MorphemeGloss.py: a class to capture, and render into HTML, the morphemes of the spoken text, using
 # standard grammatical terms
 #
-#  from https://en.wikipedia.org/wiki/Interlinear_gloss#Structure
+# from https://en.wikipedia.org/wiki/Interlinear_gloss#Structure
 #
 #  grammatical terms are commonly abbreviated and printed in SMALL CAPITALS to keep them distinct
 #  from translations,  especially when they are frequent or important for analysis.
 #
-# alos see the Leipzig Glossing Rules: https://www.eva.mpg.de/lingua/resources/glossing-rules.php
+# also see the Leipzig Glossing Rules: https://www.eva.mpg.de/lingua/resources/glossing-rules.php
 #
 # in interlienar morphological glosses, punctuation separate the glosses:
 #
@@ -31,6 +31,7 @@
 #------------------------------------------------------------------------------------------------------------------------
 import re
 from pprint import pprint
+from yattag import *
 import pdb
 #------------------------------------------------------------------------------------------------------------------------
 class MorphemeGloss:
@@ -49,22 +50,28 @@ class MorphemeGloss:
 
    def parse(self):
       """ identify terms, delimiters, plain words """
-      self.parts = extractParts(self.delimiters, self.rawText)
+      self.parts = _extractParts(self.delimiters, self.rawText)
 
    def getParts(self):
       return(self.parts)
 
-   def toHTML(self);
+   def toHTML(self, htmlDoc):
       """ iterate over the parts list, idenitfy each grammaticalTerm
           wrap each of those in a <span class='grammticalTerm'> tag
       """
-      return("nothing yet")
+      with htmlDoc.tag("div", klass="morpheme-gloss"):
+         for part in self.parts:
+            if(part in self.grammaticalTerms):
+               with htmlDoc.tag("span", klass="grammatical-term"):
+                  htmlDoc.text(part)
+            else:
+               htmlDoc.text(part)
 
 
 #------------------------------------------------------------------------------------------------------------------------
 # non-class functions
 #------------------------------------------------------------------------------------------------------------------------
-def extractParts(delimiters, string):
+def _extractParts(delimiters, string):
 
    parts = re.split(delimiters, string)
    parts_noEmptyStrings = [part for part in parts if part != ""]

@@ -69,6 +69,7 @@ INSTR
 INT
 INTENS
 INTER
+INTR
 INTR<sub>A</sub>
 INTR<sub>B</sub>
 IRR

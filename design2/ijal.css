@@ -92,3 +92,8 @@ button{
     background-color: white;
     border: 0px;
 }
+
+.grammatical-term{
+    font-size: 8px;
+    color: blue;
+}
