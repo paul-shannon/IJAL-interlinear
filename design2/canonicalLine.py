@@ -1,4 +1,5 @@
 from line import *
+from morphemeGloss import *
 import math
 
 class CanonicalLine(Line):
@@ -58,6 +59,7 @@ class CanonicalLine(Line):
 
     def toHtml(self, htmlDoc):
 
+        grammaticalTerms = open("abbreviations.txt").read().split("\n")
         with htmlDoc.tag("div", klass="line-content"):
             with htmlDoc.tag("div", klass="line"):
                 styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.wordSpacing])
@@ -70,7 +72,11 @@ class CanonicalLine(Line):
                     with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
                        for gloss in self.glosses:
                          with htmlDoc.tag("div", klass="phoneme-cell"):
-                              htmlDoc.text(gloss)
+                              print("gloss: %s" % gloss)
+                              mg = MorphemeGloss(gloss, grammaticalTerms)
+                              mg.parse()
+                              mg.toHTML(htmlDoc)
+                              #htmlDoc.text(gloss)
                     with htmlDoc.tag("div", klass="freeTranslation-tier"):
                         htmlDoc.text(self.getTable()['TEXT'][self.freeTranslationRow])
 

@@ -1,6 +1,7 @@
 # MorphemeGloss.py: a class to capture, and render into HTML, the morphemes of the spoken text, using
 # standard grammatical terms
 #
+# see https://en.wikipedia.org/wiki/List_of_glossing_abbreviations
 # from https://en.wikipedia.org/wiki/Interlinear_gloss#Structure
 #
 #  grammatical terms are commonly abbreviated and printed in SMALL CAPITALS to keep them distinct
