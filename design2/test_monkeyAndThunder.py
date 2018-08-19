@@ -11,10 +11,13 @@ pd.set_option('display.width', 1000)
 import pdb
 
 filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+grammaticalTerms = open("abbreviations.txt").read().split("\n")
+
 audioDirectory = "monkeyTest"
 xmlDoc = etree.parse(filename)
 lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
 assert(lineCount == 41)
+
 
 htmlDoc = Doc()
 
@@ -37,7 +40,7 @@ with htmlDoc.tag('html', lang="en"):
                      with htmlDoc.tag("div", klass="line-sidebar"):
                          x.htmlLeadIn(htmlDoc, audioDirectory)
                      if(classification == "CanonicalLine"):
-                         xc = CanonicalLine(xmlDoc, i)
+                         xc = CanonicalLine(xmlDoc, i, grammaticalTerms)
                          xc.toHtml(htmlDoc)
                      elif(classification == "DegenerateLine"):
                          xd = DegenerateLine(xmlDoc, i)

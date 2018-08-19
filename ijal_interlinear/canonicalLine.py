@@ -71,7 +71,7 @@ class CanonicalLine(Line):
                     with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
                        for gloss in self.glosses:
                          with htmlDoc.tag("div", klass="phoneme-cell"):
-                              print("gloss: %s" % gloss)
+                              #print("gloss: %s" % gloss)
                               mg = MorphemeGloss(gloss, self.grammaticalTerms)
                               mg.parse()
                               mg.toHTML(htmlDoc)

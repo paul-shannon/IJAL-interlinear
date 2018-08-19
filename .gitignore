@@ -3,6 +3,19 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+ijal_interlinear/testData/
+ijal_interlinear/testData//harryMosesDaylight
+ijal_interlinear/testData//harryMosesDaylight/daylight_1_4.eaf
+ijal_interlinear/testData//harryMosesDaylight/daylight_1_4.wav
+ijal_interlinear/testData//lokono
+ijal_interlinear/testData//lokono/LOKONO_IJAL_2.eaf
+ijal_interlinear/testData//monkeyAndThunder
+ijal_interlinear/testData//monkeyAndThunder/AYA1_MonkeyandThunder.eaf
+ijal_interlinear/testData//monkeyAndThunder/AYA1_MonkeyandThunder.wav
+ijal_interlinear/testData//monkeyAndThunder/grammaticalTerms.txt
+
+
+
 # C extensions
 *.so
 
