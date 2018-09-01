@@ -1,9 +1,7 @@
-import argparse
 import os.path
 import pandas as pd
 from xml.etree import ElementTree as etree
 from scipy.io.wavfile import *
-import pdb
 
 class AudioExtractor:
 

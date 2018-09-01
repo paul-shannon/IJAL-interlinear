@@ -19,34 +19,37 @@ class Text:
 
    xmlFilename = ''
    audioPath = ''
-   audioPathIsDirectory = False
+   grammaticalTermsFile = None
    grammaticalTerms = []
    xmlDoc = None
    htmlDoc = None
    lineCount = 0
+   quiet = True
 
-   def __init__(self, xmlFilename, audioPath, audioPathIsDirectory, grammaticalTermsFile):
+   def __init__(self, xmlFilename, audioPath, grammaticalTermsFile, quiet=True):
      self.xmlFilename = xmlFilename
      self.audioPath = audioPath
-     self.audioPathIsDirectory = audioPathIsDirectory
      self.grammaticalTermsFile = grammaticalTermsFile
+     self.validInputs()
+     self.quiet = quiet
+     self.xmlDoc = etree.parse(self.xmlFilename)
+     self.lineCount = len(self.xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
      self
 
    def validInputs(self):
      assert(os.path.isfile(self.xmlFilename))
-     if(self.audioPathIsDirectory):
-        assert(os.path.isdir(self.audioPath))
-     else:
-        assert(os.path.isfile(self.audioPath))
+     assert(os.path.isdir(self.audioPath))
      if(not self.grammaticalTermsFile == None):
         assert(os.path.isfile(self.grammaticalTermsFile))
         self.grammaticalTerms = open(self.grammaticalTermsFile).read().split("\n")
-        assert(len(self.grammaticaTerms) > 0)
+        assert(len(self.grammaticalTerms) > 0)
      return(True)
 
+   def getTable(self, lineNumber):
+     x = Line(self.xmlDoc, lineNumber)
+     return(x.getTable())
+
    def toHTML(self):
-     self.xmlDoc = etree.parse(self.xmlFilename)
-     self.lineCount = len(self.xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
 
      htmlDoc = Doc()
 
@@ -64,7 +67,8 @@ class Text:
                         lineID = tbl.ix[0]['ANNOTATION_ID']
                         classifier = LineClassifier(tbl)
                         classification = classifier.run()
-                        print("%3d: %s" % (i, classification))
+                        if(not self.quiet):
+                           print("%3d: %s" % (i, classification))
                         with htmlDoc.tag("div", klass="line-sidebar"):
                             x.htmlLeadIn(htmlDoc, self.audioPath)
                         if(classification == "CanonicalLine"):
