@@ -1,4 +1,4 @@
-all: morphemeGloss line canonicalLine  degenerateLine  wordsAsElementsLine
+all: morphemeGloss line canonicalLine  degenerateLine  wordsAsElementsLine text_monkeyAndThunder
 
 morphemeGloss:
 	python test_MorphemeGloss.py
@@ -14,3 +14,7 @@ degenerateLine:
 
 wordsAsElementsLine:
 	python test_WordsAsElementsLine.py
+
+text_monkeyAndThunnder:
+	python test_text_MonkeyAndThunder.py
+
