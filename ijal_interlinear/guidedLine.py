@@ -6,7 +6,7 @@ import pdb
 #------------------------------------------------------------------------------------------------------------------------
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------------------------------------------------
-class Line:
+class GuidedLine:
 
    tierInfo = []
    spokenTextID = ""
@@ -19,57 +19,30 @@ class Line:
    grammaticalTerms = None
 
 
-   def __init__(self, doc, lineNumber, grammaticalTerms=[]):
+   def __init__(self, doc, lineNumber, tierGuide, grammaticalTerms=[]):
      self.doc = doc
      self.lineNumber = lineNumber
+     self.tierGuide = tierGuide
+     self.grammaticalTerms = grammaticalTerms
      self.rootElement = self.doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
      self.allElements = findChildren(self.doc, self.rootElement)
-       # need tier info to guide traverse
-     self.tierInfo = [doc.attrib for doc in doc.findall("TIER")]
-       # [{'LINGUISTIC_TYPE_REF': 'default-lt', 'TIER_ID': 'AYA'},
-       #  {'LINGUISTIC_TYPE_REF': 'phonemic', 'PARENT_REF': 'AYA', 'TIER_ID': 'AYA2'},
-       #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA', 'TIER_ID': 'ENG'},
-       #  {'LINGUISTIC_TYPE_REF': 'translation', 'PARENT_REF': 'AYA2', 'TIER_ID': 'GL'}]
-     self.tbl = buildTable(doc, self.allElements)
-     self.rootID = self.deduceSpokenTextID()
-     self.grammaticalTerms = grammaticalTerms
+     self.tblRaw = buildTable(doc, self.allElements)
+     self.tbl = standardizeTable(self.tblRaw, tierGuide)
+     self.morphemePacking = tierGuide["morphemePacking"]
 
+     self.categories = categories = self.tbl["category"].tolist()
+     self.speechRow = self.categories.index("speech")
+     self.translationRow = self.categories.index("translation")
+     tierCount = self.tbl.shape[0]
+     self.morphemeRows = [i for i in range(tierCount) if self.categories[i] == "morpheme"]
+     self.morphemeGlossRows = [i for i in range(tierCount) if self.categories[i] == "morphemeGloss"]
 
-   def getImmediateChildrenOfRoot(self):
-      rootID = self.deduceSpokenTextID()
 
    def getTierCount(self):
        return(self.getTable().shape[0])
 
    def getTable(self):
      return(self.tbl)
-
-
-   #----------------------------------------------------------------------------------------------------
-   def deduceSpokenTextID(self):
-
-      return(self.tbl.loc[pd.isnull(self.tbl['ANNOTATION_REF'])]["ANNOTATION_ID"][0])
-
-   #----------------------------------------------------------------------------------------------------
-   def deduceWordRepresentation(self):
-
-      rootSpokenTextID = self.deduceSpokenTextID()
-      tbl_emptyLinesRemoved = self.tbl.query("TEXT != ''")
-         # do not wish to count children with empty text fields
-      numberOfDirectChildrenOfRoot = tbl_emptyLinesRemoved.ix[self.tbl["ANNOTATION_REF"] == rootSpokenTextID].shape[0]
-         # add test for present but empty word tier, as in monkey line 1
-      if(numberOfDirectChildrenOfRoot == 1):
-         return("noWords")
-      elif(numberOfDirectChildrenOfRoot == 2):
-         return("tokenizedWords")
-      elif(numberOfDirectChildrenOfRoot > 2):
-         return("wordsDistributedInElements")
-      else:
-         print("unrecognized word representation")
-
-   #----------------------------------------------------------------------------------------------------
-   def getWordRepresentation(self):
-      return(self.wordRepresentation)
 
    #----------------------------------------------------------------------------------------------------
    def show(self):
@@ -79,7 +52,9 @@ class Line:
    #----------------------------------------------------------------------------------------------------
    def getSpokenText(self):
 
-     return(self.tbl.ix[0, "TEXT"])
+    categories = self.tbl["category"].tolist()
+    row = categories.index("speech")
+    return(self.tbl.ix[0, "TEXT"])
 
 
    #----------------------------------------------------------------------------------------------------
@@ -188,14 +163,26 @@ def buildTable(doc, lineElements):
 #------------------------------------------------------------------------------------------------------------------------
 def standardizeTable(tbl, tierGuide):
 
-   print("entering standardizeTable")
-   pdb.set_trace()
    tierNames = tbl["TIER_ID"].tolist()
    permittedNames = [tierGuide[k] for k in tierGuide]
    shared = set(tierNames).intersection(permittedNames)
+
    tbl_trimmed = tbl.loc[tbl['TIER_ID'].isin(shared)]
 
-   return(tbl_trimmed)
+   tierNames = tbl_trimmed["TIER_ID"].tolist()
 
+      # reverse the guide so we can map from user-supplied and often idiosyncratic
+      # TIER_ID values, to the IJAL standard types: speech, translation, morpheme, morphemeGloss
+
+   revGuide = {v: k for k, v in tierGuide.items()}
+   ids = tbl_trimmed["TIER_ID"]
+   standardIDs = [revGuide[key] for key in ids]
+
+      # add a new column to the table.  we will use this later to assemble the html
+   tbl_final = tbl_trimmed.assign(category=standardIDs)
+
+   return(tbl_final)
+
+#------------------------------------------------------------------------------------------------------------------------
 
 

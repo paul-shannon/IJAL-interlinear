@@ -8,7 +8,6 @@ import unittest
 from line import *
 from wordsAsElementsLine import *
 from lineClassifier import *
-import importlib
 pd.set_option('display.width', 1000)
 #----------------------------------------------------------------------------------------------------
 def test_constructor():
@@ -32,6 +31,47 @@ def test_constructor():
     assert(x.wordSpacing == [11, 9, 5, 5, 7, 7])
 
 
+def test_lokonoLine0:
+
+    """
+     the Lokono story was my first encounter with the words-as-xml-elements use of the
+     eath xml schema.
+    """
+
+    filename = "../testData/lokono/LOKONO_IJAL_2.eaf"
+    xmlDoc = etree.parse(filename)
+       # line 24 has just two words, thus providing a simple yet representative study & test case
+    x = WordsAsElementsLine(xmlDoc, 24)
+    x.tbl
+    x.identifyStructure()
+    x.getTierCount()
+    x.spokenTextRow
+    x.freeTranslationRow
+    x.words
+    x.glosses
+    x.wordSpacing
+
+
+
+def test_prayerLine0:
+    """
+     the first line of ../testData/prayer/20150717_Prayer_community_one.eaf
+     does not (2 sep 2018) render into html.   use this function to figure
+     out why, to engineer a fix, and to ensure that it lasts
+    """
+    filename = "../testData/prayer/20150717_Prayer_community_one.eaf"
+    xmlDoc = etree.parse(filename)
+    x = WordsAsElementsLine(xmlDoc, 0)
+    x.tbl
+    x.getTierCount()
+    x.spokenTextRow
+    x.freeTranslationRow
+    x.words
+    x.glosses
+    x.wordSpacing
+
+
+
 def test_toHTML(displayPage=False):
     """
       create a barebones webpage, and htmlDoc, then render a DegenerateLine into it
@@ -42,7 +82,6 @@ def test_toHTML(displayPage=False):
     filename = "../testData/lokono/LOKONO_IJAL_2.eaf"
     xmlDoc = etree.parse(filename)
     x = WordsAsElementsLine(xmlDoc, 0)
-
 
     htmlDoc = Doc()
 

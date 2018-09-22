@@ -10,14 +10,17 @@ class WordsAsElementsLine(Line):
         Line.__init__(self, doc, lineNumber, grammaticalTerms)
         self.deduceStructure()
 
+    def guidedDeduceStructure(self):
+
     def deduceStructure(self):
         tbl = self.tbl
         #pdb.set_trace()
         self.spokenTextRow = tbl[tbl["START"] >= 0].index.tolist()[0]; # always 0?
         self.rootID = tbl.ix[self.spokenTextRow, "ANNOTATION_ID"]
-        allIDs = tbl["ANNOTATION_ID"].tolist()
+        allIDs = set(tbl["ANNOTATION_ID"].tolist())
+        parentIDs = set(tbl["ANNOTATION_REF"].tolist())
 
-           # the free translation row is a direct child or root, but has no children
+           # the free translation row is a direct child of root, but has no children
            # the remaining direct children of root are the word elements
         directChildrenOfRoot = tbl.loc[tbl["ANNOTATION_REF"] == self.rootID]["ANNOTATION_ID"].tolist()
         tiersWithChildren = tbl["ANNOTATION_REF"].tolist()
@@ -38,6 +41,7 @@ class WordsAsElementsLine(Line):
            self.words.append(tbl.ix[tbl["ANNOTATION_ID"] == kidIDs[0]]["TEXT"].tolist()[0])
            self.glosses.append(tbl.ix[tbl["ANNOTATION_ID"] == kidIDs[1]]["TEXT"].tolist()[0])
         assert(len(self.words) == len(self.glosses))
+        print("word count: %d" % len(self.words))
         self.wordSpacing = []
 
         for i in range(len(self.words)):
@@ -45,6 +49,28 @@ class WordsAsElementsLine(Line):
             glossSize = len(self.glosses[i])
             self.wordSpacing.append(max(wordSize, glossSize) + 1)
 
+    def identifyStructure(self):
+        tbl = self.tbl
+        tierClass = ["unknown" for i in range(tbl.shape[0])]
+        #pdb.set_trace()
+        self.spokenTextRow = tbl[tbl["START"] >= 0].index.tolist()[0]; # always 0?
+        self.rootID = tbl.ix[self.spokenTextRow, "ANNOTATION_ID"]
+        self.spokenTextID = self.rootID
+        tierClass[which(tbl, self.spokenTextID)] = "spokenText"
+        allIDs = set(tbl["ANNOTATION_ID"].tolist())
+        parentIDs = set(tbl["ANNOTATION_REF"].tolist())
+        directChildrenOfRootIDs = set(tbl.loc[tbl["ANNOTATION_REF"] == self.rootID]["ANNOTATION_ID"].tolist())
+        self.directChildrenOfRootIDs = sorted(directChildrenOfRootIDs)
+           # terminals are the word glosses, elements which are neither parentIDs nor directChildrenOfRoot
+        self.morphemeGlossIDs = sorted(allIDs.difference(parentIDs).difference(self.directChildrenOfRootIDs))  # gloss ids
+        self.morphemeIDs = tbl.loc[tbl["ANNOTATION_ID"].isin(self.morphemeGlossIDs)]["ANNOTATION_REF"].tolist()
+           # the free translation row is a direct child of root, but has no children
+           # the remaining direct children of root are the word elements
+        directChildrenCount = len(self.directChildrenOfRootIDs)
+        pdb.set_trace()
+           # perhaps the last directChildOfRoot is always the free translation line?
+        indices = [which(tbl, i) for i in self.morphemeIDs]
+        self.freeTranslationID = self.directChildrenOfRootIDs[directChildrenCount - 1]
 
     def show(self):
         print("--- WordsAsElementsLine")
@@ -95,4 +121,7 @@ class WordsAsElementsLine(Line):
             with htmlDoc.tag("div", klass="freeTranslation-tier"):
                 htmlDoc.text(self.getTable()['TEXT'][self.freeTranslationRow])
 
+
+def which(tbl, id):
+   return(tbl.index[tbl["ANNOTATION_ID"] == id].tolist()[0])
 

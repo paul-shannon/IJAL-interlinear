@@ -4,6 +4,7 @@
 import re
 import sys
 import os
+import yaml
 import unittest
 from line import *
 from canonicalLine import *
@@ -26,19 +27,23 @@ class Text:
    lineCount = 0
    quiet = True
 
-   def __init__(self, xmlFilename, audioPath, grammaticalTermsFile, quiet=True):
+   def __init__(self, xmlFilename, audioPath, grammaticalTermsFile, tierGuideFile, quiet=True):
      self.xmlFilename = xmlFilename
      self.audioPath = audioPath
      self.grammaticalTermsFile = grammaticalTermsFile
+     self.tierGuideFile = tierGuideFile
      self.validInputs()
      self.quiet = quiet
      self.xmlDoc = etree.parse(self.xmlFilename)
      self.lineCount = len(self.xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))
+     with open(tierGuideFile, 'r') as f:
+        self.tierGuide = yaml.load(f)
      self
 
    def validInputs(self):
      assert(os.path.isfile(self.xmlFilename))
-     assert(os.path.isdir(self.audioPath))
+     assert(os.path.isfile(self.tierGuideFile))
+     assert(self.audioPath == None or os.path.isdir(self.audioPath))
      if(not self.grammaticalTermsFile == None):
         assert(os.path.isfile(self.grammaticalTermsFile))
         self.grammaticalTerms = open(self.grammaticalTermsFile).read().split("\n")
@@ -49,9 +54,23 @@ class Text:
      x = Line(self.xmlDoc, lineNumber)
      return(x.getTable())
 
-   def toHTML(self):
+   def traverseStructure(self):
+      lineNumbers = range(self.lineCount)
+      for i in lineNumbers:
+         x = Line(self.xmlDoc, i)
+         tbl = x.getTable()
+         print("%d: %d tiers" % (i, tbl.shape[0]))
+
+
+
+   def toHTML(self, lineNumber=None):
 
      htmlDoc = Doc()
+
+     if(lineNumber == None):
+        lineNumbers = range(self.lineCount)
+     else:
+        lineNumbers = [lineNumber]
 
      htmlDoc.asis('<!DOCTYPE html>')
      with htmlDoc.tag('html', lang="en"):
@@ -60,7 +79,7 @@ class Text:
             htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
             htmlDoc.asis('<script src="ijalUtils.js"></script>')
             with htmlDoc.tag('body'):
-                for i in range(self.lineCount):
+                for i in lineNumbers:
                     x = Line(self.xmlDoc, i)
                     with htmlDoc.tag("div",  klass="line-wrapper"):
                         tbl = x.getTable()

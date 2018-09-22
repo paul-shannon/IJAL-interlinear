@@ -13,7 +13,7 @@ def runTests():
     test_extract_harryMosesDaylight()
     test_extract_monkeyAndThunder()
     test_extract_prayer()
-    
+
 def test_constructor():
 
     print("--- test_constructor")
@@ -46,19 +46,16 @@ def test_extract_harryMosesDaylight():
                         "../testData/harryMosesDaylight/audioPhrases")
     ea.extract(quiet=True)
     assert(len(os.listdir("../testData/harryMosesDaylight/audioPhrases")) == 4)
-    
+
 
 def test_extract_monkeyAndThunder():
-
     print("--- test_extract_monkeyAndThunder")
-
     ea = AudioExtractor("../testData/monkeyAndThunder/AYA1_MonkeyandThunder-32bit.wav",
                         "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf",
                         "../testData/monkeyAndThunder/audioPhrases")
-
     ea.extract(quiet=True)
     assert(len(os.listdir("../testData/monkeyAndThunder/audioPhrases")) == 41)
-    
+
 
 def test_extract_prayer():
     print("--- test_extract_prayer")
@@ -67,7 +64,7 @@ def test_extract_prayer():
                         "../testData/prayer/audioPhrases")
     ea.extract(quiet=False)
     assert(len(os.listdir("../testData/prayer/audioPhrases")) == 9)
-    
+
 def test_extract_aktzini():
     print("--- test_extract_aktzini")
     ea = AudioExtractor("../testData/aktzini/18-06-03Aktzini-GA.wav",
@@ -75,7 +72,7 @@ def test_extract_aktzini():
                         "../testData/aktzini/audioPhrases")
     ea.extract(quiet=False)
     assert(len(os.listdir("../testData/aktzini/audioPhrases")) == 16)
-    
+
 def test_extract_plumedSerpent():
     print("--- test_extract_plumedSerpent")
     ea = AudioExtractor("../testData/plumedSerpent/Chicahuaxtla Triqui - La serpiente emplumada 04-28-2016.wav",
@@ -83,8 +80,8 @@ def test_extract_plumedSerpent():
                         "../testData/plumedSerpent/audioPhrases")
     ea.extract(quiet=False)
     assert(len(os.listdir("../testData/plumedSerpent/audioPhrases")) == 15)
-    
+
 
 if __name__ == '__main__':
     runTests()
-    
+

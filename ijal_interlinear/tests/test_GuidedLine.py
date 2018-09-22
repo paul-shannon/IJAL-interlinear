@@ -1,10 +1,12 @@
 import re
 import sys
 sys.path.append("..")
-from line import *
+from guidedLine import *
 import importlib
 import os
 import pdb
+import guidedLine
+import yaml
 #----------------------------------------------------------------------------------------------------
 pd.set_option('display.width', 1000)
 #----------------------------------------------------------------------------------------------------
@@ -14,13 +16,33 @@ def runTests():
     showVariedTables()
     test_extractAudio()
 
+def test_sampleLine():
+
+    print("--- test_sampleLine")
+
+    filename = "../testData/lokono/LOKONO_IJAL_2.eaf"
+    doc = etree.parse(filename)
+    tierGuideFile = "../testData/lokono/tierGuide.yaml"
+    with open(tierGuideFile, 'r') as f:
+       tierGuide = yaml.load(f)
+
+    x3 = GuidedLine(doc, 3, tierGuide)
+    assert(x3.speechRow == 0)
+    assert(x3.translationRow == 1)
+    assert(x3.morphemeRows == [2, 4, 6, 8])
+    assert(x3.morphemeGlossRows == [3, 5, 7, 9])
+
 def test_buildTable():
 
     print("--- test_buildTable")
 
     filename = "../testData/lokono/LOKONO_IJAL_2.eaf"
     doc = etree.parse(filename)
-    x3 = Line(doc, 3)
+    tierGuideFile = "../testData/lokono/tierGuide.yaml"
+    with open(tierGuideFile, 'r') as f:
+       tierGuide = yaml.load(f)
+
+    x3 = Line(doc, 3, tierGuide)
     tbl = x3.getTable()
     assert(tbl.shape == (14,13))
     assert(tbl['ANNOTATION_ID'].tolist() == ['a26', 'a969', 'a12134', 'a12135', 'a12136', 'a12137', 'a20533',
