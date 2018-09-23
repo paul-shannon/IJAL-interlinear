@@ -18,7 +18,6 @@ class Line:
    soundFile = None
    grammaticalTerms = None
 
-
    def __init__(self, doc, lineNumber, grammaticalTerms=[]):
      self.doc = doc
      self.lineNumber = lineNumber

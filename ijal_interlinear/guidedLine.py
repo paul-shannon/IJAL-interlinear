@@ -18,7 +18,6 @@ class GuidedLine:
    soundFile = None
    grammaticalTerms = None
 
-
    def __init__(self, doc, lineNumber, tierGuide, grammaticalTerms=[]):
      self.doc = doc
      self.lineNumber = lineNumber
@@ -36,6 +35,7 @@ class GuidedLine:
      tierCount = self.tbl.shape[0]
      self.morphemeRows = [i for i in range(tierCount) if self.categories[i] == "morpheme"]
      self.morphemeGlossRows = [i for i in range(tierCount) if self.categories[i] == "morphemeGloss"]
+     self.calculateMorphemeSpacing()
 
 
    def getTierCount(self):
@@ -52,23 +52,72 @@ class GuidedLine:
    #----------------------------------------------------------------------------------------------------
    def getSpokenText(self):
 
-    categories = self.tbl["category"].tolist()
-    row = categories.index("speech")
-    return(self.tbl.ix[0, "TEXT"])
-
+     #categories = self.tbl["category"].tolist()
+     #row = categories.index("speech")
+     return(self.tbl.ix[self.speechRow, "TEXT"])
 
    #----------------------------------------------------------------------------------------------------
-   def htmlLeadIn(self, htmlDoc, audioDirectory):
+   def getTranslation(self):
 
-      oneBasedLineNumber = self.lineNumber + 1
-      text = "%d)" % oneBasedLineNumber
-      htmlDoc.text(text)
-      lineID = self.rootID
-      audioTag = '<audio id="%s"><source src="%s/%s.wav"/></audio>' % (lineID, audioDirectory, lineID)
-      htmlDoc.asis(audioTag)
-      imageURL = "https://www.americanlinguistics.org/wp-content/uploads/speaker.png"
-      buttonTag = '<button onclick="playSample(\'%s\')"><img src=\'%s\'/></button>' % (lineID, imageURL)
-      htmlDoc.asis(buttonTag)
+     #categories = self.tbl["category"].tolist()
+     #row = categories.index("translation")
+     return(self.tbl.ix[self.translationRow, "TEXT"])
+
+   #----------------------------------------------------------------------------------------------------
+   def getMorphemes(self):
+
+     return(self.tbl["TEXT"].iloc[self.morphemeRows].tolist())
+
+   #----------------------------------------------------------------------------------------------------
+   def getMorphemeGlosses(self):
+
+     return(self.tbl["TEXT"].iloc[self.morphemeGlossRows].tolist())
+
+   #----------------------------------------------------------------------------------------------------
+   def calculateMorphemeSpacing(self):
+
+      """
+        the word tier: direct child of root, is parent to another tier (the gloss tier)
+        gloss line: the only grandchild line among the four
+        gloss line: the only row with ANNOTATION_REF neither NaN nor rootID
+      """
+      morphemes = self.getMorphemes()
+      glosses = self.getMorphemeGlosses()
+      assert(len(morphemes) == len(glosses))
+      self.morphemeSpacing = []
+
+      for i in range(len(morphemes)):
+         morphemeSize = len(morphemes[i])
+         glossSize = len(glosses[i])
+         self.morphemeSpacing.append(max(morphemeSize, glossSize) + 1)
+
+   #----------------------------------------------------------------------------------------------------
+   def getMorphemeSpacing(self):
+
+       return(self.morphemeSpacing)
+
+   #----------------------------------------------------------------------------------------------------
+   def toHTML(self, htmlDoc):
+
+        with htmlDoc.tag("div", klass="line-content"):
+            with htmlDoc.tag("div", klass="line"):
+                styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.morphemeSpacing])
+                with htmlDoc.tag("div", klass="speech-tier"):
+                    htmlDoc.text(self.getSpokenText())
+                    #with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
+                    #    for word in self.words:
+                    #       with htmlDoc.tag("div", klass="phoneme-cell"):
+                    #          htmlDoc.text(word)
+                    #with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
+                    #   for gloss in self.glosses:
+                    #     with htmlDoc.tag("div", klass="phoneme-cell"):
+                    #          #print("gloss: %s" % gloss)
+                    #          mg = MorphemeGloss(gloss, self.grammaticalTerms)
+                    #          mg.parse()
+                    #          mg.toHTML(htmlDoc)
+                    #          #htmlDoc.text(gloss)
+                    with htmlDoc.tag("div", klass="freeTranslation-tier"):
+                        htmlDoc.text(self.getTranslation())
 
 
 #------------------------------------------------------------------------------------------------------------------------

@@ -68,10 +68,10 @@ def test_toHTML(displayPage=False):
     assert(htmlText.find("louder") == 1349)
 
     if(displayPage):
-        f = open("canonicalLine.html", "w")
-        f.write(indent(htmlText))
-        f.close()
-        os.system("open %s" % "canonicalLine.html")
+       f = open("canonicalLine.html", "w")
+       f.write(indent(htmlText))
+       f.close()
+       os.system("open %s" % "canonicalLine.html")
 
 def readAll():
 
