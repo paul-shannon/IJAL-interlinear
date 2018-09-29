@@ -11,11 +11,20 @@ import yaml
 pd.set_option('display.width', 1000)
 #----------------------------------------------------------------------------------------------------
 def runTests():
-    test_buildTable()
-    test_lokono_line_3()
-    test_extractAudio()
-    test_toHTML()
 
+    test_buildTable()
+    test_lokono_line_3()    # each morpheme and gloss are separate xml tier elements
+    test_extractAudio()
+    test_lokono_toHTML(True)
+
+    test_monkeyAndThunder_line_6() # morphemes and glosses are each packed into in
+                                   # a single tab-delimited tier element
+    test_monkeyAndThunder_toHTML(True)
+    test_plumedSerpent_toHTML(True)
+       #  test_aktzini_toHTML()
+    test_plumedSerpent_toHTML(displayPage=True)
+    test_prayer_toHTML(displayPage=True)
+    
 #----------------------------------------------------------------------------------------------------
 def test_buildTable():
 
@@ -28,6 +37,7 @@ def test_buildTable():
        tierGuide = yaml.load(f)
 
     x3 = GuidedLine(doc, 3, tierGuide)
+    x3.parse()
     tbl = x3.getTable()
     assert(tbl.shape == (10,14))
     assert(tbl.columns.tolist() == ['ANNOTATION_ID', 'LINGUISTIC_TYPE_REF', 'START', 'END',
@@ -64,6 +74,8 @@ def test_lokono_line_3():
        tierGuide = yaml.load(f)
 
     x3 = GuidedLine(doc, 3, tierGuide)
+    x3.parse()
+
     assert(x3.speechRow == 0)
     assert(x3.translationRow == 1)
     assert(x3.morphemeRows == [2, 4, 6, 8])
@@ -73,7 +85,7 @@ def test_lokono_line_3():
     assert(x3.getTranslation() == "‘[a] child, a woman as well.'")
     assert(x3.getMorphemes() == ['tʰ–ɨsa', 'aba', 'hijaro', 'kiba'])
     assert(x3.getMorphemeGlosses() == ['3FEM.POSS–child', 'INDF', 'woman', 'too'])
-    assert(x3.getMorphemeSpacing() == [16, 5, 7, 5])
+    assert(x3.getMorphemeSpacing() == [16, 5, 7, 5])   # word width + 1
 
 #----------------------------------------------------------------------------------------------------
 def test_extractAudio():
@@ -91,23 +103,245 @@ def test_extractAudio():
     assert(os.path.exists(fullPath))
 
 #----------------------------------------------------------------------------------------------------
-def test_toHTML(displayPage=False):
+def test_lokono_toHTML(displayPage=False):
 
-    print("--- test_toHTML")
+    print("--- test_lokono_toHTML")
 
     filename = "../testData/lokono/LOKONO_IJAL_2.eaf"
     xmlDoc = etree.parse(filename)
+    lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))  # 41
+
     tierGuideFile = "../testData/lokono/tierGuide.yaml"
     with open(tierGuideFile, 'r') as f:
        tierGuide = yaml.load(f)
 
-    x3 = GuidedLine(xmlDoc, 3, tierGuide)
+    lines = []
+    for i in range(lineCount):
+       guidedLine = GuidedLine(xmlDoc, i, tierGuide)
+       if(guidedLine.tierCount < 4):
+          print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+       else:
+          print("parsing line %d" % i)
+          guidedLine.parse()
+          lines.append(guidedLine)
+
+    print("parsed %d/%d complete lines" % (len(lines), lineCount))
 
     htmlDoc = Doc()
-    x3.toHTML(htmlDoc)
+
+    htmlDoc.asis('<!DOCTYPE html>')
+    with htmlDoc.tag('html', lang="en"):
+       with htmlDoc.tag('head'):
+           htmlDoc.asis('<meta charset="UTF-8">')
+           htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
+           htmlDoc.asis('<script src="ijalUtils.js"></script>')
+           with htmlDoc.tag('body'):
+               for line in lines:
+                  line.toHTML(htmlDoc)
+
     htmlText = htmlDoc.getvalue()
-    assert(htmlText.find(x3.getSpokenText()) > 0)
-    assert(htmlText.find(x3.getTranslation()) > 0)
+
+    if(displayPage):
+       filename = "tmp.html"
+       f = open(filename, "w")
+       f.write(indent(htmlText))
+       f.close()
+       os.system("open %s" % filename)
+
+
+#----------------------------------------------------------------------------------------------------
+def test_monkeyAndThunder_line_6():
+
+    """
+      used for early exploration and development of the GuidedLine class
+    """
+    print("--- test_monkeyAndThunder_line_6")
+
+    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+    doc = etree.parse(filename)
+
+    tierGuideFile = "../testData/monkeyAndThunder/tierGuide.yaml"
+    with open(tierGuideFile, 'r') as f:
+       tierGuide = yaml.load(f)
+
+    x6 = GuidedLine(doc, 6, tierGuide)
+    x6.parse()
+
+    assert(x6.speechRow == 0)
+    assert(x6.translationRow == 2)
+    assert(x6.morphemeRows == [1])
+    assert(x6.morphemeGlossRows == [3])
+
+    assert(x6.getSpokenText() == 'Ke jejn makput. Makndüj mbeʹ ii maknhwej maj.')
+    assert(x6.getTranslation() == '‘He left. He went looking for someone who could shout louder.’')
+    assert(x6.getMorphemes() == ['que', 'heM', 'mak=put', 'mak=nǝh', 'meʔ', 'ʔiː', 'mak=ŋ•weh', 'mas'])
+    assert(x6.getMorphemeGlosses() == ['that', 'there', 'CMP=exit', 'CMP=go', 'DIST', 'who', 'CMP=MOUTH•cry', 'more'])
+    assert(x6.getMorphemeSpacing() == [5, 6, 9, 8, 5, 4, 14, 5])  # word width + 1
+
+#----------------------------------------------------------------------------------------------------
+def test_monkeyAndThunder_toHTML(displayPage=False):
+
+    print("--- test_monkeyAndThunder_toHTML")
+
+    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+    xmlDoc = etree.parse(filename)
+    lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))  # 41
+
+    tierGuideFile = "../testData/monkeyAndThunder/tierGuide.yaml"
+    with open(tierGuideFile, 'r') as f:
+       tierGuide = yaml.load(f)
+
+    lines = []
+    for i in range(lineCount):
+        guidedLine = GuidedLine(xmlDoc, i, tierGuide)
+        if(guidedLine.tierCount < 4):
+            print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+        else:
+           guidedLine.parse()
+           lines.append(guidedLine)
+
+    print("parsed %d/%d complete lines" % (len(lines), lineCount))
+    
+    htmlDoc = Doc()
+
+    htmlDoc.asis('<!DOCTYPE html>')
+    with htmlDoc.tag('html', lang="en"):
+       with htmlDoc.tag('head'):
+           htmlDoc.asis('<meta charset="UTF-8">')
+           htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
+           htmlDoc.asis('<script src="ijalUtils.js"></script>')
+           with htmlDoc.tag('body'):
+               for line in lines:
+                  line.toHTML(htmlDoc)
+
+    htmlText = htmlDoc.getvalue()
+
+    if(displayPage):
+       filename = "tmp.html"
+       f = open(filename, "w")
+       f.write(indent(htmlText))
+       f.close()
+       os.system("open %s" % filename)
+
+#----------------------------------------------------------------------------------------------------
+def test_aktzini_toHTML(displayPage=False):
+
+    print("--- test_aktzini_toHTML")
+
+    filename = "../testData/aktzini/18-06-03Aktzini-GA.eaf"
+    xmlDoc = etree.parse(filename)
+    lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))  # 16
+
+    lineNumber = 0
+    for lineNumber in range(lineCount):
+       rootElement = xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
+       allElements = findChildren(xmlDoc, rootElement)
+       tmpTbl = buildTable(xmlDoc, allElements)
+       print("---- line %d" % lineNumber)
+       print(tmpTbl)
+
+       # every line has exactly two tiers: "Line"  "L3Gloss"
+       # skipping this text for now
+
+#----------------------------------------------------------------------------------------------------
+def test_plumedSerpent_toHTML(displayPage=False):
+
+    print("--- test_plumedSerpent_toHTML")
+
+    filename = "../testData/plumedSerpent/TRS Plumed Serpent Legend 05-15-2017.eaf"
+    xmlDoc = etree.parse(filename)
+    lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))  # 15
+    print(lineCount)
+
+    for lineNumber in range(lineCount):
+       rootElement = xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
+       allElements = findChildren(xmlDoc, rootElement)
+       tmpTbl = buildTable(xmlDoc, allElements)
+       print("---- line %d" % lineNumber)
+       print(tmpTbl)
+
+    tierGuideFile = "../testData/plumedSerpent/tierGuide.yaml"
+    with open(tierGuideFile, 'r') as f:
+       tierGuide = yaml.load(f)
+
+    lines = []
+    for i in range(lineCount):
+        guidedLine = GuidedLine(xmlDoc, i, tierGuide)
+        if(guidedLine.tierCount < 4):
+            print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+        else:
+           guidedLine.parse()
+           lines.append(guidedLine)
+
+    print("parsed %d/%d complete lines" % (len(lines), lineCount))
+    
+    htmlDoc = Doc()
+
+    htmlDoc.asis('<!DOCTYPE html>')
+    with htmlDoc.tag('html', lang="en"):
+       with htmlDoc.tag('head'):
+           htmlDoc.asis('<meta charset="UTF-8">')
+           htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
+           htmlDoc.asis('<script src="ijalUtils.js"></script>')
+           with htmlDoc.tag('body'):
+               for line in lines:
+                  line.toHTML(htmlDoc)
+
+    htmlText = htmlDoc.getvalue()
+
+    if(displayPage):
+       filename = "tmp.html"
+       f = open(filename, "w")
+       f.write(indent(htmlText))
+       f.close()
+       os.system("open %s" % filename)
+
+
+#----------------------------------------------------------------------------------------------------
+def test_prayer_toHTML(displayPage=False):
+
+    print("--- test_prayer_toHTML")
+
+    filename = "../testData/prayer/20150717_Prayer_community_one.eaf"
+    xmlDoc = etree.parse(filename)
+    lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))  # 9
+    print(lineCount)  
+
+    for lineNumber in range(lineCount):
+       rootElement = xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
+       allElements = findChildren(xmlDoc, rootElement)
+       tmpTbl = buildTable(xmlDoc, allElements)
+       print("---- line %d" % lineNumber)
+       print(tmpTbl)
+
+    tierGuideFile = "../testData/prayer/tierGuide.yaml"
+    with open(tierGuideFile, 'r') as f:
+       tierGuide = yaml.load(f)
+
+    lines = []
+    for i in range(lineCount):
+        guidedLine = GuidedLine(xmlDoc, i, tierGuide)
+        if(guidedLine.tierCount < 4):
+            print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+        else:
+           guidedLine.parse()
+           lines.append(guidedLine)
+
+    print("parsed %d/%d complete lines" % (len(lines), lineCount))
+    
+    htmlDoc = Doc()
+
+    htmlDoc.asis('<!DOCTYPE html>')
+    with htmlDoc.tag('html', lang="en"):
+       with htmlDoc.tag('head'):
+           htmlDoc.asis('<meta charset="UTF-8">')
+           htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
+           htmlDoc.asis('<script src="ijalUtils.js"></script>')
+           with htmlDoc.tag('body'):
+               for line in lines:
+                  line.toHTML(htmlDoc)
+
+    htmlText = htmlDoc.getvalue()
 
     if(displayPage):
        filename = "tmp.html"

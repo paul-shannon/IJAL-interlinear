@@ -26,17 +26,25 @@ class GuidedLine:
      self.rootElement = self.doc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
      self.allElements = findChildren(self.doc, self.rootElement)
      self.tblRaw = buildTable(doc, self.allElements)
-     self.tbl = standardizeTable(self.tblRaw, tierGuide)
-     self.morphemePacking = tierGuide["morphemePacking"]
+     self.tierCount = self.tblRaw.shape[0]
+
+   def parse(self):
+      # print(self.tblRaw)
+     assert(self.tierCount >= 4)
+     self.tbl = standardizeTable(self.tblRaw, self.tierGuide)
+     self.tbl.index = range(len(self.tbl.index))
+     self.morphemePacking = self.tierGuide["morphemePacking"]
 
      self.categories = categories = self.tbl["category"].tolist()
      self.speechRow = self.categories.index("speech")
      self.translationRow = self.categories.index("translation")
      tierCount = self.tbl.shape[0]
+     # pdb.set_trace()
      self.morphemeRows = [i for i in range(tierCount) if self.categories[i] == "morpheme"]
      self.morphemeGlossRows = [i for i in range(tierCount) if self.categories[i] == "morphemeGloss"]
+     self.morphemes = self.extractMorphemes()
+     self.morphemeGlosses = self.extractMorphemeGlosses()
      self.calculateMorphemeSpacing()
-
 
    def getTierCount(self):
        return(self.getTable().shape[0])
@@ -61,25 +69,55 @@ class GuidedLine:
 
      #categories = self.tbl["category"].tolist()
      #row = categories.index("translation")
+     #pdb.set_trace()
      return(self.tbl.ix[self.translationRow, "TEXT"])
 
    #----------------------------------------------------------------------------------------------------
-   def getMorphemes(self):
+   def extractMorphemes(self):
 
-     return(self.tbl["TEXT"].iloc[self.morphemeRows].tolist())
+     assert(self.morphemePacking in ["tiers", "tabs"])
+
+     if(self.morphemePacking == "tiers"):
+        return(self.tbl["TEXT"].iloc[self.morphemeRows].tolist())
+
+     if(self.morphemePacking == "tabs"):
+        # pdb.set_trace()
+        rawMorphemeText = self.tbl["TEXT"].iloc[self.morphemeRows].tolist()[0]
+        # pdb.set_trace()
+        morphemes = rawMorphemeText.split("\t")
+        return(morphemes)
 
    #----------------------------------------------------------------------------------------------------
-   def getMorphemeGlosses(self):
+   def extractMorphemeGlosses(self):
 
-     return(self.tbl["TEXT"].iloc[self.morphemeGlossRows].tolist())
+     if(self.morphemePacking == "tiers"):
+        return(self.tbl["TEXT"].iloc[self.morphemeGlossRows].tolist())
 
+     if(self.morphemePacking == "tabs"):
+        rawMorphemeGlossText = self.tbl["TEXT"].iloc[self.morphemeGlossRows].tolist()[0]
+        # pdb.set_trace()
+        morphemeGlosses = rawMorphemeGlossText.split("\t")
+        return(morphemeGlosses)
+
+   #----------------------------------------------------------------------------------------------------
+   def getMorphemes (self):
+
+      return(self.morphemes)
+   
+   #----------------------------------------------------------------------------------------------------
+   def getMorphemeGlosses (self):
+
+      return(self.morphemeGlosses)
+   
    #----------------------------------------------------------------------------------------------------
    def calculateMorphemeSpacing(self):
 
       """
-        the word tier: direct child of root, is parent to another tier (the gloss tier)
-        gloss line: the only grandchild line among the four
-        gloss line: the only row with ANNOTATION_REF neither NaN nor rootID
+       the spacing is used to create a styleString, specifying grid cell widths which
+       accomodate the widest of each morpheme/gloss pair, so that they each member of
+       each pair is vertically aligned:
+          m1      m2      ----m3-----
+          g1   ---g2---       g3
       """
       morphemes = self.getMorphemes()
       glosses = self.getMorphemeGlosses()
@@ -104,18 +142,16 @@ class GuidedLine:
                 styleString = "grid-template-columns: %s;" % ''.join(["%dch " % p for p in self.morphemeSpacing])
                 with htmlDoc.tag("div", klass="speech-tier"):
                     htmlDoc.text(self.getSpokenText())
-                    #with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
-                    #    for word in self.words:
-                    #       with htmlDoc.tag("div", klass="phoneme-cell"):
-                    #          htmlDoc.text(word)
-                    #with htmlDoc.tag("div", klass="phoneme-tier", style=styleString):
-                    #   for gloss in self.glosses:
-                    #     with htmlDoc.tag("div", klass="phoneme-cell"):
-                    #          #print("gloss: %s" % gloss)
-                    #          mg = MorphemeGloss(gloss, self.grammaticalTerms)
-                    #          mg.parse()
-                    #          mg.toHTML(htmlDoc)
-                    #          #htmlDoc.text(gloss)
+
+                    with htmlDoc.tag("div", klass="morpheme-tier", style=styleString):
+                        for morpheme in self.getMorphemes():
+                           with htmlDoc.tag("div", klass="morpheme-cell"):
+                              htmlDoc.text(morpheme)
+                    with htmlDoc.tag("div", klass="morpheme-tier", style=styleString):
+                        for morphemeGloss in self.getMorphemeGlosses():
+                           with htmlDoc.tag("div", klass="morpheme-cell"):
+                              htmlDoc.text(morphemeGloss)
+                              
                     with htmlDoc.tag("div", klass="freeTranslation-tier"):
                         htmlDoc.text(self.getTranslation())
 
