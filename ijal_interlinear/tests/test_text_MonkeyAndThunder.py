@@ -20,7 +20,8 @@ def test_constructor():
     
     text = Text("../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf",
                 "../testData/monkeyAndThunder/audioPhrases",
-                grammaticalTermsFile="../testData/monkeyAndThunder/grammaticalTerms.txt")
+                grammaticalTermsFile="../testData/monkeyAndThunder/grammaticalTerms.txt",
+                tierGuideFile="../testData/monkeyAndThunder/tierGuide.yaml")
      
     assert(text.validInputs())
 
@@ -30,7 +31,8 @@ def test_toHTML():
     
     text = Text("../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf",
                 "../testData/monkeyAndThunder/audioPhrases",
-                grammaticalTermsFile="../testData/monkeyAndThunder/grammaticalTerms.txt")
+                grammaticalTermsFile="../testData/monkeyAndThunder/grammaticalTerms.txt",
+                tierGuideFile="../testData/monkeyAndThunder/tierGuide.yaml")
      
     text.getTable(0)
     

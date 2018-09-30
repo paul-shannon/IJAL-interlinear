@@ -140,6 +140,20 @@ class GuidedLine:
        return(self.morphemeSpacing)
 
    #----------------------------------------------------------------------------------------------------
+   def htmlLeadIn(self, htmlDoc, audioDirectory):
+
+      oneBasedLineNumber = self.lineNumber + 1
+      text = "%d)" % oneBasedLineNumber
+      htmlDoc.text(text)
+      lineID = self.rootID
+      audioTag = '<audio id="%s"><source src="%s/%s.wav"/></audio>' % (lineID, audioDirectory, lineID)
+      htmlDoc.asis(audioTag)
+      imageURL = "https://www.americanlinguistics.org/wp-content/uploads/speaker.png"
+      buttonTag = '<button onclick="playSample(\'%s\')"><img src=\'%s\'/></button>' % (lineID, imageURL)
+      htmlDoc.asis(buttonTag)
+
+
+   #----------------------------------------------------------------------------------------------------
    def toHTML(self, htmlDoc):
 
         with htmlDoc.tag("div", klass="line-content"):

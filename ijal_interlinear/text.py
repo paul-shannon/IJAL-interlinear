@@ -6,10 +6,10 @@ import sys
 import os
 import yaml
 import unittest
-from line import *
-from canonicalLine import *
-from degenerateLine import *
-from lineClassifier import *
+from guidedLine import *
+#from canonicalLine import *
+#from degenerateLine import *
+#from lineClassifier import *
 import importlib
 pd.set_option('display.width', 1000)
 import pdb
@@ -61,8 +61,6 @@ class Text:
          tbl = x.getTable()
          print("%d: %d tiers" % (i, tbl.shape[0]))
 
-
-
    def toHTML(self, lineNumber=None):
 
      htmlDoc = Doc()
@@ -80,22 +78,26 @@ class Text:
             htmlDoc.asis('<script src="ijalUtils.js"></script>')
             with htmlDoc.tag('body'):
                 for i in lineNumbers:
-                    x = Line(self.xmlDoc, i)
+                    guidedLine = GuidedLine(self.xmlDoc, i, self.tierGuide)
+                    guidedLine.parse()
+                    #x = Line(self.xmlDoc, i)
                     with htmlDoc.tag("div",  klass="line-wrapper"):
-                        tbl = x.getTable()
+                        tbl = guidedLine.getTable()
                         lineID = tbl.ix[0]['ANNOTATION_ID']
-                        classifier = LineClassifier(tbl)
-                        classification = classifier.run()
-                        if(not self.quiet):
-                           print("%3d: %s" % (i, classification))
+                        #classifier = LineClassifier(tbl)
+                        #classification = classifier.run()
+                        #if(not self.quiet):
+                        #   print("%3d: %s" % (i, classification))
                         with htmlDoc.tag("div", klass="line-sidebar"):
-                            x.htmlLeadIn(htmlDoc, self.audioPath)
-                        if(classification == "CanonicalLine"):
-                            xc = CanonicalLine(self.xmlDoc, i, self.grammaticalTerms)
-                            xc.toHtml(htmlDoc)
-                        elif(classification == "DegenerateLine"):
-                            xd = DegenerateLine(self.xmlDoc, i)
-                            xd.toHtml(htmlDoc)
+                            guidedLine.htmlLeadIn(htmlDoc, self.audioPath, )
+                        guidedLine.toHTML(htmlDoc)
+
+                        #if(classification == "CanonicalLine"):
+                        #    xc = CanonicalLine(self.xmlDoc, i, self.grammaticalTerms)
+                        #    xc.toHtml(htmlDoc)
+                        #elif(classification == "DegenerateLine"):
+                        #    xd = DegenerateLine(self.xmlDoc, i)
+                        #    xd.toHtml(htmlDoc)
      self.htmlDoc = htmlDoc
      self.htmlText = htmlDoc.getvalue()
      return(self.htmlText)
