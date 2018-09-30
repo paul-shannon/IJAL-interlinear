@@ -179,6 +179,35 @@ def test_monkeyAndThunder_line_6():
     assert(x6.getMorphemeSpacing() == [5, 6, 9, 8, 5, 4, 14, 5])  # word width + 1
 
 #----------------------------------------------------------------------------------------------------
+def test_monkeyAndThunder_line_0():
+
+    """
+      neither morphemes nor glosses in this line: just spanish and english
+    """
+    print("--- test_monkeyAndThunder_line_0")
+
+    filename = "../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf"
+    doc = etree.parse(filename)
+
+    tierGuideFile = "../testData/monkeyAndThunder/tierGuide.yaml"
+    with open(tierGuideFile, 'r') as f:
+       tierGuide = yaml.load(f)
+
+    x0 = GuidedLine(doc, 0, tierGuide)
+    x0.parse()
+
+    assert(x0.speechRow == 0)
+    assert(x0.translationRow == 1)
+    assert(x0.morphemeRows == [])
+    assert(x0.morphemeGlossRows == [])
+
+    assert(x0.getSpokenText() == 'Por ejemplo el, como se llama, el mono,')
+    assert(x0.getTranslation() == '‘For example it, what do you call it, the monkey,’')
+    assert(x0.getMorphemes() == [])
+    assert(x0.getMorphemeGlosses() == [])
+    assert(x0.getMorphemeSpacing() == [])
+
+#----------------------------------------------------------------------------------------------------
 def test_monkeyAndThunder_toHTML(displayPage=False):
 
     print("--- test_monkeyAndThunder_toHTML")
@@ -194,11 +223,11 @@ def test_monkeyAndThunder_toHTML(displayPage=False):
     lines = []
     for i in range(lineCount):
         guidedLine = GuidedLine(xmlDoc, i, tierGuide)
-        if(guidedLine.tierCount < 4):
-            print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
-        else:
-           guidedLine.parse()
-           lines.append(guidedLine)
+        #if(guidedLine.tierCount < 4):
+        #    print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+        #else:
+        guidedLine.parse()
+        lines.append(guidedLine)
 
     print("parsed %d/%d complete lines" % (len(lines), lineCount))
     
@@ -248,7 +277,7 @@ def test_plumedSerpent_toHTML(displayPage=False):
 
     print("--- test_plumedSerpent_toHTML")
 
-    filename = "../testData/plumedSerpent/TRS Plumed Serpent Legend 05-15-2017.eaf"
+    filename = "../testData/plumedSerpent/TRS_Plumed_Serpent_Legend_05-15-2017.eaf"
     xmlDoc = etree.parse(filename)
     lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))  # 15
     print(lineCount)

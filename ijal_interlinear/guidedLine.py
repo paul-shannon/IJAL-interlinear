@@ -29,8 +29,7 @@ class GuidedLine:
      self.tierCount = self.tblRaw.shape[0]
 
    def parse(self):
-      # print(self.tblRaw)
-     assert(self.tierCount >= 4)
+     assert(self.tierCount >= 2)
      self.tbl = standardizeTable(self.tblRaw, self.tierGuide)
      self.tbl.index = range(len(self.tbl.index))
      self.morphemePacking = self.tierGuide["morphemePacking"]
@@ -75,6 +74,9 @@ class GuidedLine:
    #----------------------------------------------------------------------------------------------------
    def extractMorphemes(self):
 
+     if(self.morphemeRows == []):
+        return([])
+     
      assert(self.morphemePacking in ["tiers", "tabs"])
 
      if(self.morphemePacking == "tiers"):
@@ -89,6 +91,9 @@ class GuidedLine:
 
    #----------------------------------------------------------------------------------------------------
    def extractMorphemeGlosses(self):
+
+     if(self.morphemeGlossRows == []):
+        return([])
 
      if(self.morphemePacking == "tiers"):
         return(self.tbl["TEXT"].iloc[self.morphemeGlossRows].tolist())
@@ -143,14 +148,19 @@ class GuidedLine:
                 with htmlDoc.tag("div", klass="speech-tier"):
                     htmlDoc.text(self.getSpokenText())
 
-                    with htmlDoc.tag("div", klass="morpheme-tier", style=styleString):
-                        for morpheme in self.getMorphemes():
-                           with htmlDoc.tag("div", klass="morpheme-cell"):
-                              htmlDoc.text(morpheme)
-                    with htmlDoc.tag("div", klass="morpheme-tier", style=styleString):
-                        for morphemeGloss in self.getMorphemeGlosses():
-                           with htmlDoc.tag("div", klass="morpheme-cell"):
-                              htmlDoc.text(morphemeGloss)
+                    morphemes = self.getMorphemes()
+                    if(len(morphemes) > 0):
+                       with htmlDoc.tag("div", klass="morpheme-tier", style=styleString):
+                          for morpheme in morphemes:
+                             with htmlDoc.tag("div", klass="morpheme-cell"):
+                                htmlDoc.text(morpheme)
+
+                    morphemeGlosses = self.getMorphemeGlosses()
+                    if(len(morphemeGlosses) > 0):
+                       with htmlDoc.tag("div", klass="morpheme-tier", style=styleString):
+                          for morphemeGloss in self.getMorphemeGlosses():
+                             with htmlDoc.tag("div", klass="morpheme-cell"):
+                                htmlDoc.text(morphemeGloss)
                               
                     with htmlDoc.tag("div", klass="freeTranslation-tier"):
                         htmlDoc.text(self.getTranslation())
