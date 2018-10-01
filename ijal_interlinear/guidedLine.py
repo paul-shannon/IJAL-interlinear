@@ -1,5 +1,6 @@
 import pandas as pd
 from xml.etree import ElementTree as etree
+from morphemeGloss import *
 from pprint import pprint
 from yattag import *
 import pdb
@@ -44,6 +45,7 @@ class GuidedLine:
      self.morphemes = self.extractMorphemes()
      self.morphemeGlosses = self.extractMorphemeGlosses()
      self.calculateMorphemeSpacing()
+     self.rootID = self.tbl.ix[self.speechRow, "ANNOTATION_ID"]
 
    def getTierCount(self):
        return(self.getTable().shape[0])
@@ -174,7 +176,9 @@ class GuidedLine:
                        with htmlDoc.tag("div", klass="morpheme-tier", style=styleString):
                           for morphemeGloss in self.getMorphemeGlosses():
                              with htmlDoc.tag("div", klass="morpheme-cell"):
-                                htmlDoc.text(morphemeGloss)
+                                mg = MorphemeGloss(morphemeGloss, self.grammaticalTerms)
+                                mg.parse()
+                                mg.toHTML(htmlDoc)
                               
                     with htmlDoc.tag("div", klass="freeTranslation-tier"):
                         htmlDoc.text(self.getTranslation())

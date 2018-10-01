@@ -12,8 +12,7 @@ pd.set_option('display.width', 1000)
 def runTests():
 
     test_constructor()
-    test_forConsistentLineTierStructure()
-    test_toHTML()
+    test_toHTML(display=True)
 
 def test_constructor():
 
@@ -21,8 +20,8 @@ def test_constructor():
 
     text = Text("../testData/lokono/LOKONO_IJAL_2.eaf",
                 audioPath=None,
-                grammaticalTermsFile=None)
-
+                grammaticalTermsFile=None,
+                tierGuideFile="../testData/lokono/tierGuide.yaml")
     assert(text.validInputs())
 
 def test_traverseStructure():
@@ -30,34 +29,39 @@ def test_traverseStructure():
     print("--- test_traverseStructure")
     text = Text("../testData/lokono/LOKONO_IJAL_2.eaf",
                 audioPath=None,
-                grammaticalTermsFile=None)
+                grammaticalTermsFile=None,
+                tierGuideFile="../testData/lokono/tierGuide.yaml")
     text.traverseStructure()
 
 def exploreMapping():
 
     text = Text("../testData/lokono/LOKONO_IJAL_2.eaf",
                 audioPath=None,
-                grammaticalTermsFile=None)
+                grammaticalTermsFile=None,
+                tierGuideFile="../testData/lokono/tierGuide.yaml")
+
     text.getTable(0)
 
 
-def test_toHTML():
+def test_toHTML(display=False):
 
     print("--- test_toHTML")
 
     text = Text("../testData/lokono/LOKONO_IJAL_2.eaf",
                 audioPath=None, #"../testData/lokono/audioPhrases",
                 grammaticalTermsFile="../testData/monkeyAndThunder/grammaticalTerms.txt",
-                tierGuideFile="../testData/lokono/tierGuide.yaml")
+                tierGuideFile="../testData/lokono/tierGuide.yaml",
+                quiet=False)
 
     text.getTable(0)
 
     htmlText = text.toHTML()
-    filename = "monkeyAndThunder.html"
-    f = open(filename, "w")
-    f.write(indent(htmlText))
-    f.close()
-    os.system("open %s" % filename)
+    if(display):
+        filename = "lokono.html"
+        f = open(filename, "w")
+        f.write(indent(htmlText))
+        f.close()
+        os.system("open %s" % filename)
 
 if __name__ == '__main__':
     runTests()

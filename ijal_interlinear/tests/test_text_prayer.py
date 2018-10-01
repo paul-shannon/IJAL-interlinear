@@ -20,6 +20,7 @@ def test_toHTML():
     text = Text("../testData/prayer/20150717_Prayer_community_one.eaf",
                 "../testData/prayer/audioPhrases",
                 grammaticalTermsFile=None,
+                tierGuideFile="../testData/prayer/tierGuide.yaml",
                 quiet=False)
 
     text.getTable(0)

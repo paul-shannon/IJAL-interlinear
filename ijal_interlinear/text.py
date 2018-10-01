@@ -51,13 +51,15 @@ class Text:
      return(True)
 
    def getTable(self, lineNumber):
-     x = Line(self.xmlDoc, lineNumber)
+     x = GuidedLine(self.xmlDoc, lineNumber, self.tierGuide)
+     x.parse()
      return(x.getTable())
 
    def traverseStructure(self):
       lineNumbers = range(self.lineCount)
       for i in lineNumbers:
-         x = Line(self.xmlDoc, i)
+         x = GuidedLine(self.xmlDoc, i, self.tierGuide)
+         x.parse()
          tbl = x.getTable()
          print("%d: %d tiers" % (i, tbl.shape[0]))
 
@@ -78,9 +80,10 @@ class Text:
             htmlDoc.asis('<script src="ijalUtils.js"></script>')
             with htmlDoc.tag('body'):
                 for i in lineNumbers:
-                    guidedLine = GuidedLine(self.xmlDoc, i, self.tierGuide)
+                    if(not self.quiet):
+                       print("line %d/%d" % (i, self.lineCount))
+                    guidedLine = GuidedLine(self.xmlDoc, i, self.tierGuide, self.grammaticalTerms)
                     guidedLine.parse()
-                    #x = Line(self.xmlDoc, i)
                     with htmlDoc.tag("div",  klass="line-wrapper"):
                         tbl = guidedLine.getTable()
                         lineID = tbl.ix[0]['ANNOTATION_ID']

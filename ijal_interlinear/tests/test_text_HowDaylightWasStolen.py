@@ -19,7 +19,9 @@ def test_constructor():
 
     text = Text("../testData/harryMosesDaylight/daylight_1_4.eaf",
                 "../testData/harryMosesDaylight/audioPhrases",
-                grammaticalTermsFile=None)
+                grammaticalTermsFile=None,
+                tierGuideFile="../testData/harryMosesDaylight/tierGuide.yaml")
+
      
     assert(text.validInputs())
 
@@ -29,7 +31,8 @@ def test_toHTML():
     
     text = Text("../testData/harryMosesDaylight/daylight_1_4.eaf",
                 "../testData/harryMosesDaylight/audioPhrases",
-                grammaticalTermsFile=None)
+                grammaticalTermsFile=None,
+                tierGuideFile="../testData/harryMosesDaylight/tierGuide.yaml")
 
     text.getTable(1)
 

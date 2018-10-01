@@ -15,15 +15,14 @@ def runTests():
     test_buildTable()
     test_lokono_line_3()    # each morpheme and gloss are separate xml tier elements
     test_extractAudio()
-    test_lokono_toHTML(True)
+    test_lokono_toHTML(False, sampleOfLinesOnly=True)
 
     test_monkeyAndThunder_line_6() # morphemes and glosses are each packed into in
                                    # a single tab-delimited tier element
-    test_monkeyAndThunder_toHTML(True)
-    test_plumedSerpent_toHTML(True)
+    test_monkeyAndThunder_toHTML(False)
+    test_plumedSerpent_toHTML(False)
        #  test_aktzini_toHTML()
-    test_plumedSerpent_toHTML(displayPage=True)
-    test_prayer_toHTML(displayPage=True)
+    test_prayer_toHTML(displayPage=False)
     
 #----------------------------------------------------------------------------------------------------
 def test_buildTable():
@@ -103,7 +102,7 @@ def test_extractAudio():
     assert(os.path.exists(fullPath))
 
 #----------------------------------------------------------------------------------------------------
-def test_lokono_toHTML(displayPage=False):
+def test_lokono_toHTML(displayPage=False, sampleOfLinesOnly=True):
 
     print("--- test_lokono_toHTML")
 
@@ -116,16 +115,22 @@ def test_lokono_toHTML(displayPage=False):
        tierGuide = yaml.load(f)
 
     lines = []
-    for i in range(lineCount):
+
+    if(sampleOfLinesOnly):
+        maxLines = 10
+    else:
+        maxLines = lineCount
+
+    for i in range(maxLines):
        guidedLine = GuidedLine(xmlDoc, i, tierGuide)
        if(guidedLine.tierCount < 4):
           print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
        else:
-          print("parsing line %d" % i)
+          # print("parsing line %d" % i)
           guidedLine.parse()
           lines.append(guidedLine)
 
-    print("parsed %d/%d complete lines" % (len(lines), lineCount))
+    # print("parsed %d/%d complete lines" % (len(lines), lineCount))
 
     htmlDoc = Doc()
 
@@ -164,7 +169,11 @@ def test_monkeyAndThunder_line_6():
     with open(tierGuideFile, 'r') as f:
        tierGuide = yaml.load(f)
 
-    x6 = GuidedLine(doc, 6, tierGuide)
+    grammaticalTermsFile = "../testData/monkeyAndThunder/grammaticalTerms.txt"
+    grammaticalTerms = open(grammaticalTermsFile).read().split("\n")
+    assert("MOUTH" in grammaticalTerms)
+    
+    x6 = GuidedLine(doc, 6, tierGuide, grammaticalTerms)
     x6.parse()
 
     assert(x6.speechRow == 0)
@@ -177,6 +186,12 @@ def test_monkeyAndThunder_line_6():
     assert(x6.getMorphemes() == ['que', 'heM', 'mak=put', 'mak=nǝh', 'meʔ', 'ʔiː', 'mak=ŋ•weh', 'mas'])
     assert(x6.getMorphemeGlosses() == ['that', 'there', 'CMP=exit', 'CMP=go', 'DIST', 'who', 'CMP=MOUTH•cry', 'more'])
     assert(x6.getMorphemeSpacing() == [5, 6, 9, 8, 5, 4, 14, 5])  # word width + 1
+
+    htmlDoc = Doc()
+    x6.toHTML(htmlDoc)
+    htmlText = htmlDoc.getvalue()
+    assert(htmlText.count("grammatical-term") == 5)
+    #print(indent(htmlText))
 
 #----------------------------------------------------------------------------------------------------
 def test_monkeyAndThunder_line_0():
@@ -229,7 +244,7 @@ def test_monkeyAndThunder_toHTML(displayPage=False):
         guidedLine.parse()
         lines.append(guidedLine)
 
-    print("parsed %d/%d complete lines" % (len(lines), lineCount))
+    #print("parsed %d/%d complete lines" % (len(lines), lineCount))
     
     htmlDoc = Doc()
 
@@ -267,7 +282,7 @@ def test_aktzini_toHTML(displayPage=False):
        allElements = findChildren(xmlDoc, rootElement)
        tmpTbl = buildTable(xmlDoc, allElements)
        print("---- line %d" % lineNumber)
-       print(tmpTbl)
+       #print(tmpTbl)
 
        # every line has exactly two tiers: "Line"  "L3Gloss"
        # skipping this text for now
@@ -280,14 +295,14 @@ def test_plumedSerpent_toHTML(displayPage=False):
     filename = "../testData/plumedSerpent/TRS_Plumed_Serpent_Legend_05-15-2017.eaf"
     xmlDoc = etree.parse(filename)
     lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))  # 15
-    print(lineCount)
+    #print(lineCount)
 
     for lineNumber in range(lineCount):
        rootElement = xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
        allElements = findChildren(xmlDoc, rootElement)
        tmpTbl = buildTable(xmlDoc, allElements)
-       print("---- line %d" % lineNumber)
-       print(tmpTbl)
+       #print("---- line %d" % lineNumber)
+       #print(tmpTbl)
 
     tierGuideFile = "../testData/plumedSerpent/tierGuide.yaml"
     with open(tierGuideFile, 'r') as f:
@@ -302,7 +317,7 @@ def test_plumedSerpent_toHTML(displayPage=False):
            guidedLine.parse()
            lines.append(guidedLine)
 
-    print("parsed %d/%d complete lines" % (len(lines), lineCount))
+    # print("parsed %d/%d complete lines" % (len(lines), lineCount))
     
     htmlDoc = Doc()
 
@@ -334,14 +349,14 @@ def test_prayer_toHTML(displayPage=False):
     filename = "../testData/prayer/20150717_Prayer_community_one.eaf"
     xmlDoc = etree.parse(filename)
     lineCount = len(xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION"))  # 9
-    print(lineCount)  
+    # print(lineCount)  
 
     for lineNumber in range(lineCount):
        rootElement = xmlDoc.findall("TIER/ANNOTATION/ALIGNABLE_ANNOTATION")[lineNumber]
        allElements = findChildren(xmlDoc, rootElement)
        tmpTbl = buildTable(xmlDoc, allElements)
-       print("---- line %d" % lineNumber)
-       print(tmpTbl)
+       #print("---- line %d" % lineNumber)
+       #print(tmpTbl)
 
     tierGuideFile = "../testData/prayer/tierGuide.yaml"
     with open(tierGuideFile, 'r') as f:
@@ -356,7 +371,7 @@ def test_prayer_toHTML(displayPage=False):
            guidedLine.parse()
            lines.append(guidedLine)
 
-    print("parsed %d/%d complete lines" % (len(lines), lineCount))
+    #print("parsed %d/%d complete lines" % (len(lines), lineCount))
     
     htmlDoc = Doc()
 
