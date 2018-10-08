@@ -18,7 +18,7 @@ def test_toHTML(display=False):
     print("--- test_toHTML")
     
     text = Text("../testData/plumedSerpent/TRS_Plumed_Serpent_Legend_05-15-2017.eaf",
-                "../testData/plumedSerpent/audioPhrases",
+                None, #"../testData/plumedSerpent/audioPhrases",
                 grammaticalTermsFile=None,
                 tierGuideFile="../testData/plumedSerpent/tierGuide.yaml",
                 quiet=False)

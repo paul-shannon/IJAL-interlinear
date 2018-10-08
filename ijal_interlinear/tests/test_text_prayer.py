@@ -18,7 +18,7 @@ def test_toHTML():
     print("--- test_toHTML")
     
     text = Text("../testData/prayer/20150717_Prayer_community_one.eaf",
-                "../testData/prayer/audioPhrases",
+                None, #"../testData/prayer/audioPhrases",
                 grammaticalTermsFile=None,
                 tierGuideFile="../testData/prayer/tierGuide.yaml",
                 quiet=False)
