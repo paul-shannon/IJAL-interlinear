@@ -71,12 +71,13 @@
 .morpheme-tier {
   display: grid;
   background-color: white;
-  //border: 0px solid rgba(0, 0, 0, 0.8);
+  border: 0px solid rgba(0, 0, 0, 0.8);
   grid-template-columns: 4ch 5ch 5ch 4ch 5ch 12ch 7ch 5ch 16ch;
   grid-column-gap: 2%;
   font-size: 20px;
   margin: 5px;
   width: 95%;
+  justify-content: flex-start;
   }
 
 .morpheme-cell {
@@ -95,5 +96,5 @@ button{
 
 .grammatical-term{
     font-size: small;
-    color: green;
+    color: blue;
 }

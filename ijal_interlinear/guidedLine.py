@@ -36,6 +36,7 @@ class GuidedLine:
      self.morphemePacking = self.tierGuide["morphemePacking"]
 
      self.categories = categories = self.tbl["category"].tolist()
+     pdb.set_trace()
      self.speechRow = self.categories.index("speech")
      self.translationRow = self.categories.index("translation")
      tierCount = self.tbl.shape[0]

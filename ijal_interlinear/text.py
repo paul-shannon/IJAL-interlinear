@@ -40,6 +40,11 @@ class Text:
         self.tierGuide = yaml.load(f)
      self
 
+   def discoverTiers(self):
+     tmpDoc = etree.parse(self.xmlFilename)
+     tierIDs = [tier.attrib["TIER_ID"] for tier in tmpDoc.findall("TIER")]
+     return(tierIDs)
+   
    def validInputs(self):
      assert(os.path.isfile(self.xmlFilename))
      assert(os.path.isfile(self.tierGuideFile))
