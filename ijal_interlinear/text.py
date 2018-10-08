@@ -6,10 +6,7 @@ import sys
 import os
 import yaml
 import unittest
-from guidedLine import *
-#from canonicalLine import *
-#from degenerateLine import *
-#from lineClassifier import *
+from ijalLine import *
 import importlib
 pd.set_option('display.width', 1000)
 import pdb
@@ -56,14 +53,14 @@ class Text:
      return(True)
 
    def getTable(self, lineNumber):
-     x = GuidedLine(self.xmlDoc, lineNumber, self.tierGuide)
+     x = IjalLine(self.xmlDoc, lineNumber, self.tierGuide)
      x.parse()
      return(x.getTable())
 
    def traverseStructure(self):
       lineNumbers = range(self.lineCount)
       for i in lineNumbers:
-         x = GuidedLine(self.xmlDoc, i, self.tierGuide)
+         x = IjalLine(self.xmlDoc, i, self.tierGuide)
          x.parse()
          tbl = x.getTable()
          print("%d: %d tiers" % (i, tbl.shape[0]))
@@ -87,25 +84,15 @@ class Text:
                 for i in lineNumbers:
                     if(not self.quiet):
                        print("line %d/%d" % (i, self.lineCount))
-                    guidedLine = GuidedLine(self.xmlDoc, i, self.tierGuide, self.grammaticalTerms)
-                    guidedLine.parse()
+                    line = IjalLine(self.xmlDoc, i, self.tierGuide, self.grammaticalTerms)
+                    line.parse()
                     with htmlDoc.tag("div",  klass="line-wrapper"):
-                        tbl = guidedLine.getTable()
+                        tbl = line.getTable()
                         lineID = tbl.ix[0]['ANNOTATION_ID']
-                        #classifier = LineClassifier(tbl)
-                        #classification = classifier.run()
-                        #if(not self.quiet):
-                        #   print("%3d: %s" % (i, classification))
                         with htmlDoc.tag("div", klass="line-sidebar"):
-                            guidedLine.htmlLeadIn(htmlDoc, self.audioPath, )
-                        guidedLine.toHTML(htmlDoc)
+                            line.htmlLeadIn(htmlDoc, self.audioPath, )
+                        line.toHTML(htmlDoc)
 
-                        #if(classification == "CanonicalLine"):
-                        #    xc = CanonicalLine(self.xmlDoc, i, self.grammaticalTerms)
-                        #    xc.toHtml(htmlDoc)
-                        #elif(classification == "DegenerateLine"):
-                        #    xd = DegenerateLine(self.xmlDoc, i)
-                        #    xd.toHtml(htmlDoc)
      self.htmlDoc = htmlDoc
      self.htmlText = htmlDoc.getvalue()
      return(self.htmlText)

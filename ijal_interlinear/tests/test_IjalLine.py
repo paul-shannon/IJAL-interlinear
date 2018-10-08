@@ -1,12 +1,12 @@
 import re
 import sys
 sys.path.append("..")
-from guidedLine import *
+from ijalLine import *
 import importlib
 import os
 import pdb
-import guidedLine
 import yaml
+import pandas as pd
 #----------------------------------------------------------------------------------------------------
 pd.set_option('display.width', 1000)
 #----------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ def test_buildTable():
     with open(tierGuideFile, 'r') as f:
        tierGuide = yaml.load(f)
 
-    x3 = GuidedLine(doc, 3, tierGuide)
+    x3 = IjalLine(doc, 3, tierGuide)
     x3.parse()
     tbl = x3.getTable()
     assert(tbl.shape == (10,14))
@@ -62,7 +62,7 @@ def test_buildTable():
 def test_lokono_line_3():
 
     """
-      used for early exploration and development of the GuidedLine class
+      used for early exploration and development of the IjalLine class
     """
     print("--- test_lokono_line_3")
 
@@ -72,7 +72,7 @@ def test_lokono_line_3():
     with open(tierGuideFile, 'r') as f:
        tierGuide = yaml.load(f)
 
-    x3 = GuidedLine(doc, 3, tierGuide)
+    x3 = IjalLine(doc, 3, tierGuide)
     x3.parse()
 
     assert(x3.speechRow == 0)
@@ -122,13 +122,13 @@ def test_lokono_toHTML(displayPage=False, sampleOfLinesOnly=True):
         maxLines = lineCount
 
     for i in range(maxLines):
-       guidedLine = GuidedLine(xmlDoc, i, tierGuide)
-       if(guidedLine.tierCount < 4):
-          print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+       line = IjalLine(xmlDoc, i, tierGuide)
+       if(line.tierCount < 4):
+          print("skipping line %d, tierCount %d" %(i, line.tierCount))
        else:
           # print("parsing line %d" % i)
-          guidedLine.parse()
-          lines.append(guidedLine)
+          line.parse()
+          lines.append(line)
 
     # print("parsed %d/%d complete lines" % (len(lines), lineCount))
 
@@ -158,7 +158,7 @@ def test_lokono_toHTML(displayPage=False, sampleOfLinesOnly=True):
 def test_monkeyAndThunder_line_6():
 
     """
-      used for early exploration and development of the GuidedLine class
+      used for early exploration and development of the IjalLine class
     """
     print("--- test_monkeyAndThunder_line_6")
 
@@ -173,7 +173,7 @@ def test_monkeyAndThunder_line_6():
     grammaticalTerms = open(grammaticalTermsFile).read().split("\n")
     assert("MOUTH" in grammaticalTerms)
     
-    x6 = GuidedLine(doc, 6, tierGuide, grammaticalTerms)
+    x6 = IjalLine(doc, 6, tierGuide, grammaticalTerms)
     x6.parse()
 
     assert(x6.speechRow == 0)
@@ -208,7 +208,7 @@ def test_monkeyAndThunder_line_0():
     with open(tierGuideFile, 'r') as f:
        tierGuide = yaml.load(f)
 
-    x0 = GuidedLine(doc, 0, tierGuide)
+    x0 = IjalLine(doc, 0, tierGuide)
     x0.parse()
 
     assert(x0.speechRow == 0)
@@ -237,12 +237,12 @@ def test_monkeyAndThunder_toHTML(displayPage=False):
 
     lines = []
     for i in range(lineCount):
-        guidedLine = GuidedLine(xmlDoc, i, tierGuide)
-        #if(guidedLine.tierCount < 4):
-        #    print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+        line = IjalLine(xmlDoc, i, tierGuide)
+        #if(line.tierCount < 4):
+        #    print("skipping line %d, tierCount %d" %(i, line.tierCount))
         #else:
-        guidedLine.parse()
-        lines.append(guidedLine)
+        line.parse()
+        lines.append(line)
 
     #print("parsed %d/%d complete lines" % (len(lines), lineCount))
     
@@ -310,12 +310,12 @@ def test_plumedSerpent_toHTML(displayPage=False):
 
     lines = []
     for i in range(lineCount):
-        guidedLine = GuidedLine(xmlDoc, i, tierGuide)
-        if(guidedLine.tierCount < 4):
-            print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+        line = IjalLine(xmlDoc, i, tierGuide)
+        if(line.tierCount < 4):
+            print("skipping line %d, tierCount %d" %(i, line.tierCount))
         else:
-           guidedLine.parse()
-           lines.append(guidedLine)
+           line.parse()
+           lines.append(line)
 
     # print("parsed %d/%d complete lines" % (len(lines), lineCount))
     
@@ -364,12 +364,12 @@ def test_prayer_toHTML(displayPage=False):
 
     lines = []
     for i in range(lineCount):
-        guidedLine = GuidedLine(xmlDoc, i, tierGuide)
-        if(guidedLine.tierCount < 4):
-            print("skipping line %d, tierCount %d" %(i, guidedLine.tierCount))
+        line = IjalLine(xmlDoc, i, tierGuide)
+        if(line.tierCount < 4):
+            print("skipping line %d, tierCount %d" %(i, line.tierCount))
         else:
-           guidedLine.parse()
-           lines.append(guidedLine)
+           line.parse()
+           lines.append(line)
 
     #print("parsed %d/%d complete lines" % (len(lines), lineCount))
     
