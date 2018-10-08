@@ -1,10 +1,13 @@
-all: morphemeGloss guidedLine text_daylight text_monkeyAndThunder text_lokono text_PlumedSerpent text_prayer text_lokono
+all: morphemeGloss ijalLine audioExtractor text_daylight text_monkeyAndThunder  text_PlumedSerpent text_prayer 
 
 morphemeGloss:
 	python test_MorphemeGloss.py
 
-guidedLine:
-	python test_GuidedLine.py
+ijalLine:
+	python test_IjalLine.py
+
+audioExtractor:
+	python test_audioExtractor.py
 
 text_monkeyAndThunder:
 	python test_text_MonkeyAndThunder.py
@@ -15,12 +18,12 @@ text_daylight:
 text_PlumedSerpent:
 	python test_text_PlumedSerpent.py
 
-# test_text_aktzini.py
-text_lokono:
-	python test_text_lokono.py
-
 text_prayer:
 	python test_text_prayer.py
+
+# takes several minutes to run, but a worthwhile test, now not run out of the "all" target above
+text_lokono:
+	python test_text_lokono.py
 
 
 

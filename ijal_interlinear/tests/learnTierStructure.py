@@ -9,5 +9,5 @@
 #
 filename = "../testData/harryMosesDaylight/daylight_1_4.eaf"
 xmlDoc = etree.parse(filename)
-x = GuidedLine(xmlDoc, lineNumber=0, tierGuide=None, grammaticalTerms=[])
+x = Line(xmlDoc, lineNumber=0, tierGuide=None, grammaticalTerms=[])
 x.tblRaw["TIER_ID"].tolist()
