@@ -14,7 +14,7 @@ def runTests():
 
     test_buildTable()
     test_lokono_line_3()    # each morpheme and gloss are separate xml tier elements
-    test_extractAudio()
+    # test_extractAudio()   # only works when LARGE monkeyAndThunder files is present
     test_lokono_toHTML(False, sampleOfLinesOnly=True)
 
     test_monkeyAndThunder_line_6() # morphemes and glosses are each packed into in
@@ -99,6 +99,7 @@ def test_extractAudio():
     soundFileURI = soundFileElement.attrib["RELATIVE_MEDIA_URL"]
     directory = os.path.dirname(os.path.abspath(filename))
     fullPath = os.path.join(directory, soundFileURI)
+    print("fullPath: %s" % fullPath)
     assert(os.path.exists(fullPath))
 
 #----------------------------------------------------------------------------------------------------
