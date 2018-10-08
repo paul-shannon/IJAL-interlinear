@@ -5,6 +5,7 @@ __pycache__/
 
 *.tar
 *.tar.gz
+*.html
 
 ijal_interlinear/testData/aktzini/18-06-03Aktzini-GA.wav
 ijal_interlinear/testData/harryMosesDaylight/daylight_1_4.wav
