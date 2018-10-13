@@ -11,8 +11,8 @@ def runTests():
     test_constructor()
     test_determineStartAndEndTimes()
     test_extract_harryMosesDaylight()
-    test_extract_monkeyAndThunder()
-    test_extract_prayer()
+    #test_extract_monkeyAndThunder()
+    #test_extract_prayer()
 
 def test_constructor():
 

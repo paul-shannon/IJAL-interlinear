@@ -19,7 +19,7 @@ def test_constructor():
     print("--- test_constructor")
     
     text = Text("../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf",
-                "../testData/monkeyAndThunder/audioPhrases",
+                None, #"../testData/monkeyAndThunder/audioPhrases",
                 grammaticalTermsFile="../testData/monkeyAndThunder/grammaticalTerms.txt",
                 tierGuideFile="../testData/monkeyAndThunder/tierGuide.yaml")
      
@@ -30,7 +30,7 @@ def test_toHTML():
     print("--- test_toHTML")
     
     text = Text("../testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf",
-                "../testData/monkeyAndThunder/audioPhrases",
+                None, #"../testData/monkeyAndThunder/audioPhrases",
                 grammaticalTermsFile="../testData/monkeyAndThunder/grammaticalTerms.txt",
                 tierGuideFile="../testData/monkeyAndThunder/tierGuide.yaml")
      
