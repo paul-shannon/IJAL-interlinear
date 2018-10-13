@@ -34,6 +34,9 @@ import re
 from pprint import pprint
 from yattag import *
 import pdb
+
+# -*- coding: utf-8 -*-
+
 #------------------------------------------------------------------------------------------------------------------------
 class MorphemeGloss:
 
