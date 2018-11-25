@@ -1,7 +1,6 @@
 import datetime
 import base64
 import pdb
-
 import xmlschema
 # schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
 # schema.is_valid('../ijal_interlinear/testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf')
@@ -15,47 +14,59 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 
+UPLOAD_DIRECTORY = "./UPLOADS"
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.scripts.config.serve_locally = True
 
-buttonStyle = {'width': '160px',
+buttonStyle = {'width': '140px',
                'height': '60px',
+               'color': 'gray',
+               'fontFamily': 'HelveticaNeue',
+               'margin-right': 10,
                'lineHeight': '60px',
                'borderWidth': '1px',
-               'borderStyle': 'dashed',
+               'borderStyle': 'solid',
                'borderRadius': '5px',
                'textAlign': 'center',
-               'margin': '0px'
+               'text-decoration': 'none',
+               'display': 'inline-block'
                }
 #----------------------------------------------------------------------------------------------------
 def create_eafUploader():
 
     uploader = dcc.Upload(id='upload-eaf-file',
-                          children=html.Div([html.A('Select File')]),
-                          style=buttonStyle,
-                          multiple=False)
+                          children=html.Div([html.A('Select File', style=buttonStyle)]),
+                                                    #style={'font-size': 16,
+                                                    #       'border': '1px solid gray',
+                                                    #       'color': 'black',
+                                                    #       'text-decoration': 'none'})]),
+                          #style=buttonStyle,
+                          multiple=False,
+                          style={'display': 'inline-block'})
 
     return uploader
 
 #----------------------------------------------------------------------------------------------------
 def create_eafUploaderTab():
 
-   style = {'border': '1px solid purple',
+   style = {'border': '5px solid purple',
             'border-radius': '5px',
             'padding': '10px'}
 
    textArea = dcc.Textarea(id="eafUploadTextArea",
                            placeholder='xml validation results go here',
-                           value="initially, nothing...",
-                           style={'width': 1000, 'height': 400})
+                           value="",
+                           style={'width': 600, 'height': 300})
 
    children = [html.Br(),
-               create_eafUploader(),
+               html.Div([create_eafUploader(),
+                         html.Button("Validate XML", style=buttonStyle)],
+                        style={'display': 'inline-block'}),
                html.Br(),
-               html.Button("Validate XML"),
                html.Br(),
                textArea
                ]
@@ -90,14 +101,21 @@ def create_uploadsDiv():
 
    style = {'border': '1px solid purple',
             'border-radius': '5px',
-            'padding': '10px'}
+            'padding': '1px'}
+
+   tabsStyle = {'width': '100%',
+                'fontFamily': 'Sans-Serif',
+                'font-size': 12,
+                'margin-left': 'auto',
+                'margin-right': 'auto'
+                }
 
    tabs = dcc.Tabs(id="tabs-example", value='tab-1-example',
                    children=[dcc.Tab(label='EAF', children=create_eafUploaderTab()),
                              dcc.Tab(label='Sound', value='tab-2-example'),
                              dcc.Tab(label='Tiers', value='tab-3-example'),
-                             dcc.Tab(label='Grammatical Terms', value='tab-4-example')
-                   ]),
+                             dcc.Tab(label='GrammaticalTerms', value='tab-4-example')
+                   ], style=tabsStyle)
 
    children = tabs;
    div = html.Div(children=children, id='uploads-div', className="eight columns") # , style=style)
@@ -178,14 +196,13 @@ def updateEafLabel(contents, name, date):
 def on_eafUpload(contents, name, date):
     if name is not None:
        print("on_eafUpload, name: %s" % name)
-       return name
-       #return({'value': name})
-    #return({'value': name})
-    #if contents is not None:
-    #    #children = [
-    #    #    parse_eafUpload(c, n, d) for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)]
-    #    children = [parse_eaf_upload(contents, name, date)]
-    #    return children
+       data = contents.encode("utf8").split(b";base64,")[1]
+       filename = os.path.join(UPLOAD_DIRECTORY, name)
+       with open(filename, "wb") as fp:
+         fp.write(base64.decodebytes(data))
+         fileSize = os.path.getsize(filename)
+         print("filesize: %d" % fileSize)
+    return "%s: %d bytes" % (name, fileSize)
 
 #----------------------------------------------------------------------------------------------------
 
