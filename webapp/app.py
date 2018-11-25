@@ -35,6 +35,8 @@ buttonStyle = {'width': '140px',
                'text-decoration': 'none',
                'display': 'inline-block'
                }
+disabledButtonStyle = buttonStyle
+disabledButtonStyle["disabled"] = True
 #----------------------------------------------------------------------------------------------------
 def create_eafUploader():
 
@@ -64,7 +66,7 @@ def create_eafUploaderTab():
 
    children = [html.Br(),
                html.Div([create_eafUploader(),
-                         html.Button("Validate XML", style=buttonStyle)],
+                         html.Button("Validate XML", disabled=True, id="validateXmlButton", style=buttonStyle)],
                         style={'display': 'inline-block'}),
                html.Br(),
                html.Br(),
@@ -166,7 +168,8 @@ def parse_eaf_upload(contents, filename, date):
 app.layout = html.Div(
     children=[
         create_masterDiv(),
-        create_uploadsDiv()
+        create_uploadsDiv(),
+        html.P(id="scratchPad", style={'display': 'hidden'}),
     ],
     className="row",
     id='outerDiv',
@@ -202,7 +205,22 @@ def on_eafUpload(contents, name, date):
          fp.write(base64.decodebytes(data))
          fileSize = os.path.getsize(filename)
          print("filesize: %d" % fileSize)
-    return "%s: %d bytes" % (name, fileSize)
+         schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
+         validXML = schema.is_valid(filename)
+         validationMessage = "%s (%d bytes), valid XML: %s" % (name, fileSize, validXML)
+         if(not validXML):
+            try:
+               schema.validate(filename)
+            except xmlschema.XMLSchemaValidationError as e:
+               failureReason = e.reason
+               validationMessage = "%s.  error: %s" % (validationMessage, failureReason)
+         return validationMessage
+
+@app.callback(Output('scratchPad', 'children'),
+              [Input('validateXmlButton', "n_clicks")])
+def on_click(clickCount):
+    if clickCount is not None:
+       print("validate button click: %d" % clickCount)
 
 #----------------------------------------------------------------------------------------------------
 
