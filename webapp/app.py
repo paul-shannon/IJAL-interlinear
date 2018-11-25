@@ -2,6 +2,14 @@ import datetime
 import base64
 import pdb
 
+import xmlschema
+# schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
+# schema.is_valid('../ijal_interlinear/testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf')
+# schema.validate('../ijal_interlinear/testData/harryMosesDaylight/daylight_1_4.eaf')
+#   xmlschema.validators.exceptions.XMLSchemaValidationError: failed validating <Element 'ANNOTATION_DOCUMENT' at
+#        0x10e6e5688> with XsdKeyref(name='tierNameRef', refer='tierNameKey'):
+#   Reason: Key 'tierNameRef' with value ('todo',) not found for identity constraint of element 'ANNOTATION_DOCUMENT'.
+
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -13,14 +21,14 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.scripts.config.serve_locally = True
 
-buttonStyle = {'width': '100px',
+buttonStyle = {'width': '160px',
                'height': '60px',
                'lineHeight': '60px',
                'borderWidth': '1px',
                'borderStyle': 'dashed',
                'borderRadius': '5px',
                'textAlign': 'center',
-               'margin': '5px'
+               'margin': '0px'
                }
 #----------------------------------------------------------------------------------------------------
 def create_eafUploader():
@@ -44,9 +52,11 @@ def create_eafUploaderTab():
                            value="initially, nothing...",
                            style={'width': 1000, 'height': 400})
 
-   children = [create_eafUploader(),
-               html.Label("Filename: ", id="eaf_filename_label"),
+   children = [html.Br(),
+               create_eafUploader(),
+               html.Br(),
                html.Button("Validate XML"),
+               html.Br(),
                textArea
                ]
 
@@ -62,16 +72,16 @@ def create_masterDiv():
             'padding': '10px'}
 
    title = html.H4("Status")
-   eafStatus = html.Label("EAF: ")
+   eafStatus = html.Label("EAF: ", id="eafStatusLabel", style={"font-size": 14})
    soundStatus = html.Label("Sound: ")
    tierMapStatus = html.Label("Tier map: ")
    grammaticalTermsStatus = html.Label("Grammatical terms: ")
-   lineBreak = html.Br()
-   button = html.Button("Run", style=buttonStyle)
+   run_button = html.Button("Run", style=buttonStyle)
 
-   children = [title, eafStatus, soundStatus, tierMapStatus, grammaticalTermsStatus, lineBreak, button]
+   children = [title, eafStatus, soundStatus, tierMapStatus, grammaticalTermsStatus,
+               html.Br(), run_button]
 
-   div = html.Div(children=children, id='master-div', className="three columns", style=style)
+   div = html.Div(children=children, id='master-div', className="four columns", style=style)
 
    return div
 
@@ -90,7 +100,7 @@ def create_uploadsDiv():
                    ]),
 
    children = tabs;
-   div = html.Div(children=children, id='uploads-div', className="nine columns") # , style=style)
+   div = html.Div(children=children, id='uploads-div', className="eight columns") # , style=style)
 
    return div
 
@@ -150,6 +160,17 @@ app.layout = html.Div(
         })
 
 #----------------------------------------------------------------------------------------------------
+@app.callback(Output('eafStatusLabel', 'children'),
+              [Input('upload-eaf-file', 'contents')],
+              [State('upload-eaf-file', 'filename'),
+               State('upload-eaf-file', 'last_modified')])
+def updateEafLabel(contents, name, date):
+   if name is None:
+       return "EAF: "
+   if name is not None:
+       print("on_eafUpload, name: %s" % name)
+       return "EAF: %s" % name
+
 @app.callback(Output('eafUploadTextArea', 'value'),
               [Input('upload-eaf-file', 'contents')],
               [State('upload-eaf-file', 'filename'),
