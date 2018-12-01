@@ -37,9 +37,31 @@ class Text:
         self.tierGuide = yaml.load(f)
      self
 
-   def discoverTiers(self):
+   #def discoverTiers(self):
+   #  tmpDoc = etree.parse(self.xmlFilename)
+   #  tierIDs = [tier.attrib["TIER_ID"] for tier in tmpDoc.findall("TIER")]
+   #  return(tierIDs)
+   
+   def getTierSummary(self):
      tmpDoc = etree.parse(self.xmlFilename)
      tierIDs = [tier.attrib["TIER_ID"] for tier in tmpDoc.findall("TIER")]
+     tiers = tmpDoc.findall("TIER")
+     #print(self.tierGuide)
+     tbl = pd.DataFrame(list(self.tierGuide.items()), columns=['key', 'value']).ix[0:3]
+     tbl['count'] = [0, 0, 0, 0]
+     tierValues = tbl["value"].tolist()
+     for i in range(4):
+        tier = tiers[i]
+        tierValue = tierValues[i]
+        tierID = tier.attrib["TIER_ID"]
+        count = len(tier.findall("ANNOTATION"))
+        rowNumber = tbl[tbl['value']==tierValue].index.item()
+        tbl.ix[rowNumber, 'count'] = count
+        #print(" %30s: %4d" % (tierID, count))
+     self.tierTable = tbl
+     return(tbl)
+
+
      return(tierIDs)
    
    def validInputs(self):

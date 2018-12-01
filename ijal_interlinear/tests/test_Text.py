@@ -9,7 +9,7 @@ import pdb
 pd.set_option('display.width', 1000)
 #----------------------------------------------------------------------------------------------------
 def runTests(display=False):
-    test_HowDaylightWasStolen()
+    test_HowDaylightWasStolen(display)
 
 #----------------------------------------------------------------------------------------------------
 def test_HowDaylightWasStolen(display):

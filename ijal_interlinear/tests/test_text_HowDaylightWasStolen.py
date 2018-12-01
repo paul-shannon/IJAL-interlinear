@@ -9,9 +9,9 @@ import pdb
 pd.set_option('display.width', 1000)
 #----------------------------------------------------------------------------------------------------
 
-def runTests():
+def runTests(display=False):
     test_constructor()
-    test_toHTML()
+    test_toHTML(display)
 
 def test_constructor():
 
@@ -22,10 +22,10 @@ def test_constructor():
                 grammaticalTermsFile=None,
                 tierGuideFile="../testData/harryMosesDaylight/tierGuide.yaml")
 
-     
     assert(text.validInputs())
+    tbl = text.getTierSummary()
 
-def test_toHTML():
+def test_toHTML(display=False):
 
     print("--- test_toHTML")
     
@@ -41,7 +41,8 @@ def test_toHTML():
     f = open(filename, "w")
     f.write(indent(htmlText))
     f.close()
-    os.system("open %s" % filename)
+    if(display):
+       os.system("open %s" % filename)
     
 if __name__ == '__main__':
     runTests()
