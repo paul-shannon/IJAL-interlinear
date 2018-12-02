@@ -74,7 +74,7 @@ class Text:
         assert(len(self.grammaticalTerms) > 0)
      return(True)
 
-   def getTable(self, lineNumber):
+   def getLineAsTable(self, lineNumber):
      x = IjalLine(self.xmlDoc, lineNumber, self.tierGuide)
      x.parse()
      return(x.getTable())
