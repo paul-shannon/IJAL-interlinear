@@ -2,6 +2,9 @@ import datetime
 import base64
 import pdb
 import xmlschema
+import os
+import scipy.io.wavfile as wavfile
+
 # schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
 # schema.is_valid('../ijal_interlinear/testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf')
 # schema.validate('../ijal_interlinear/testData/harryMosesDaylight/daylight_1_4.eaf')
@@ -42,11 +45,6 @@ def create_eafUploader():
 
     uploader = dcc.Upload(id='upload-eaf-file',
                           children=html.Div([html.A('Select File', style=buttonStyle)]),
-                                                    #style={'font-size': 16,
-                                                    #       'border': '1px solid gray',
-                                                    #       'color': 'black',
-                                                    #       'text-decoration': 'none'})]),
-                          #style=buttonStyle,
                           multiple=False,
                           style={'display': 'inline-block'})
 
@@ -65,8 +63,7 @@ def create_eafUploaderTab():
                            style={'width': 600, 'height': 300})
 
    children = [html.Br(),
-               html.Div([create_eafUploader(),
-                         html.Button("Validate XML", disabled=True, id="validateXmlButton", style=buttonStyle)],
+               html.Div([create_eafUploader()],
                         style={'display': 'inline-block'}),
                html.Br(),
                html.Br(),
@@ -74,6 +71,40 @@ def create_eafUploaderTab():
                ]
 
    div = html.Div(children=children, id='eafUploaderDiv') #, style=style)
+
+   return div
+
+#----------------------------------------------------------------------------------------------------
+def create_soundFileUploader():
+
+    uploader = dcc.Upload(id='upload-sound-file',
+                          children=html.Div([html.A('Select File', style=buttonStyle)]),
+                          multiple=False,
+                          style={'display': 'inline-block'})
+
+    return uploader
+
+#----------------------------------------------------------------------------------------------------
+def create_soundFileUploaderTab():
+
+   style = {'border': '5px solid purple',
+            'border-radius': '5px',
+            'padding': '10px'}
+
+   textArea = dcc.Textarea(id="soundFileUploadTextArea",
+                           placeholder='sound file validation results go here',
+                           value="",
+                           style={'width': 600, 'height': 300})
+
+   children = [html.Br(),
+               html.Div([create_soundFileUploader()],
+                        style={'display': 'inline-block'}),
+               html.Br(),
+               html.Br(),
+               textArea
+               ]
+
+   div = html.Div(children=children, id='soundFileUploaderDiv')
 
    return div
 
@@ -114,7 +145,7 @@ def create_uploadsDiv():
 
    tabs = dcc.Tabs(id="tabs-example", value='tab-1-example',
                    children=[dcc.Tab(label='EAF', children=create_eafUploaderTab()),
-                             dcc.Tab(label='Sound', value='tab-2-example'),
+                             dcc.Tab(label='Sound', children=create_soundFileUploaderTab()),
                              dcc.Tab(label='Tiers', value='tab-3-example'),
                              dcc.Tab(label='GrammaticalTerms', value='tab-4-example')
                    ], style=tabsStyle)
@@ -192,6 +223,7 @@ def updateEafLabel(contents, name, date):
        print("on_eafUpload, name: %s" % name)
        return "EAF: %s" % name
 
+#----------------------------------------------------------------------------------------------------
 @app.callback(Output('eafUploadTextArea', 'value'),
               [Input('upload-eaf-file', 'contents')],
               [State('upload-eaf-file', 'filename'),
@@ -204,23 +236,43 @@ def on_eafUpload(contents, name, date):
        with open(filename, "wb") as fp:
          fp.write(base64.decodebytes(data))
          fileSize = os.path.getsize(filename)
-         print("filesize: %d" % fileSize)
+         print("eaf file size: %d" % fileSize)
          schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
          validXML = schema.is_valid(filename)
-         validationMessage = "%s (%d bytes), valid XML: %s" % (name, fileSize, validXML)
+         eaf_validationMessage = "%s (%d bytes), valid XML: %s" % (name, fileSize, validXML)
          if(not validXML):
             try:
                schema.validate(filename)
             except xmlschema.XMLSchemaValidationError as e:
                failureReason = e.reason
-               validationMessage = "%s.  error: %s" % (validationMessage, failureReason)
-         return validationMessage
-
-@app.callback(Output('scratchPad', 'children'),
-              [Input('validateXmlButton', "n_clicks")])
-def on_click(clickCount):
-    if clickCount is not None:
-       print("validate button click: %d" % clickCount)
+               eaf_validationMessage = "%s.  error: %s" % (validationMessage, failureReason)
+         return eaf_validationMessage
 
 #----------------------------------------------------------------------------------------------------
+@app.callback(Output('soundFileUploadTextArea', 'value'),
+              [Input('upload-sound-file', 'contents')],
+              [State('upload-sound-file', 'filename'),
+               State('upload-sound-file', 'last_modified')])
+def on_soundUpload(contents, name, date):
+    if name is None:
+        return("")
+    data = contents.encode("utf8").split(b";base64,")[1]
+    filename = os.path.join(UPLOAD_DIRECTORY, name)
+    with open(filename, "wb") as fp:
+       fp.write(base64.decodebytes(data))
+       fileSize = os.path.getsize(filename)
+       errorMessage = ""
+       validSound = True
+       try:
+          rate, mtx = wavfile.read(filename)
+       except ValueError as e:
+          print("exeption in wavfile: %s" % e)
+          rate = -1
+          validSound = False
+          errorMessage = str(e)
+       print("sound file size: %d, rate: %d" % (fileSize, rate))
+       sound_validationMessage = "%s (%d bytes), valid sound: %s %s" % (name, fileSize, validSound, errorMessage)
+       return sound_validationMessage
 
+#----------------------------------------------------------------------------------------------------
+# app.run_server()
