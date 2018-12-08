@@ -147,6 +147,40 @@ def create_tierMapUploaderTab():
    return div
 
 #----------------------------------------------------------------------------------------------------
+def create_grammaticalTermsUploaderTab():
+
+   style = {'border': '5px solid purple',
+            'border-radius': '5px',
+            'padding': '10px'}
+
+   textArea = dcc.Textarea(id="grammaticalTermsUploadTextArea",
+                           placeholder='grammatical terms will be displayed here',
+                           value="",
+                           style={'width': 600, 'height': 300})
+
+   children = [html.Br(),
+               html.Div([create_grammaticalTermsFileUploader()],
+                        style={'display': 'inline-block'}),
+               html.Br(),
+               html.Br(),
+               textArea
+               ]
+
+   div = html.Div(children=children, id='grammaticalTermsFileUploaderDiv')
+
+   return div
+
+#----------------------------------------------------------------------------------------------------
+def create_grammaticalTermsFileUploader():
+
+    uploader = dcc.Upload(id='upload-grammaticalTerms-file',
+                          children=html.Div([html.A('Select File', style=buttonStyle)]),
+                          multiple=False,
+                          style={'display': 'inline-block'})
+
+    return uploader
+
+#----------------------------------------------------------------------------------------------------
 def create_masterDiv():
 
    style = {'border': '1px solid green',
@@ -185,7 +219,7 @@ def create_uploadsDiv():
                    children=[dcc.Tab(label='EAF', children=create_eafUploaderTab()),
                              dcc.Tab(label='Sound', children=create_soundFileUploaderTab()),
                              dcc.Tab(label='Tier Map', children=create_tierMapUploaderTab()),
-                             dcc.Tab(label='GrammaticalTerms', value='tab-4-example')
+                             dcc.Tab(label='GrammaticalTerms', children=create_grammaticalTermsUploaderTab())
                    ], style=tabsStyle)
 
    children = tabs;
@@ -318,6 +352,26 @@ def on_soundUpload(contents, name, date):
               [State('upload-tierMap-file', 'filename'),
                State('upload-tierMap-file', 'last_modified')])
 def on_tierMapUpload(contents, name, date):
+    if name is None:
+        return("")
+    encodedString = contents.encode("utf8").split(b";base64,")[1]
+    decodedString = base64.b64decode(encodedString)
+    s = decodedString.decode('utf-8')
+    yaml_list = yaml.load(s)
+    filename = os.path.join(UPLOAD_DIRECTORY, name)
+    with open(filename, "w") as fp:
+       fp.write(s)
+       fp.close()
+       return(s)
+   
+    return("foo")
+
+#----------------------------------------------------------------------------------------------------
+@app.callback(Output('grammaticalTermsUploadTextArea', 'value'),
+              [Input('upload-grammaticalTerms-file', 'contents')],
+              [State('upload-grammaticalTerms-file', 'filename'),
+               State('upload-grammaticalTerms-file', 'last_modified')])
+def on_grammaticalTermsUpload(contents, name, date):
     if name is None:
         return("")
     encodedString = contents.encode("utf8").split(b";base64,")[1]
