@@ -4,6 +4,11 @@ import pdb
 import xmlschema
 import os
 import scipy.io.wavfile as wavfile
+import dash
+import pandas as pd
+import dash_table
+import yaml
+import io
 
 # schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
 # schema.is_valid('../ijal_interlinear/testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf')
@@ -12,7 +17,6 @@ import scipy.io.wavfile as wavfile
 #        0x10e6e5688> with XsdKeyref(name='tierNameRef', refer='tierNameKey'):
 #   Reason: Key 'tierNameRef' with value ('todo',) not found for identity constraint of element 'ANNOTATION_DOCUMENT'.
 
-import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
@@ -109,6 +113,40 @@ def create_soundFileUploaderTab():
    return div
 
 #----------------------------------------------------------------------------------------------------
+def create_tierMapFileUploader():
+
+    uploader = dcc.Upload(id='upload-tierMap-file',
+                          children=html.Div([html.A('Select File', style=buttonStyle)]),
+                          multiple=False,
+                          style={'display': 'inline-block'})
+
+    return uploader
+
+#----------------------------------------------------------------------------------------------------
+def create_tierMapUploaderTab():
+
+   style = {'border': '5px solid purple',
+            'border-radius': '5px',
+            'padding': '10px'}
+
+   textArea = dcc.Textarea(id="tierMapUploadTextArea",
+                           placeholder='tierGuide.yaml will be displayed here',
+                           value="",
+                           style={'width': 600, 'height': 300})
+
+   children = [html.Br(),
+               html.Div([create_tierMapFileUploader()],
+                        style={'display': 'inline-block'}),
+               html.Br(),
+               html.Br(),
+               textArea
+               ]
+
+   div = html.Div(children=children, id='tierGuideFileUploaderDiv')
+
+   return div
+
+#----------------------------------------------------------------------------------------------------
 def create_masterDiv():
 
    style = {'border': '1px solid green',
@@ -146,7 +184,7 @@ def create_uploadsDiv():
    tabs = dcc.Tabs(id="tabs-example", value='tab-1-example',
                    children=[dcc.Tab(label='EAF', children=create_eafUploaderTab()),
                              dcc.Tab(label='Sound', children=create_soundFileUploaderTab()),
-                             dcc.Tab(label='Tiers', value='tab-3-example'),
+                             dcc.Tab(label='Tier Map', children=create_tierMapUploaderTab()),
                              dcc.Tab(label='GrammaticalTerms', value='tab-4-example')
                    ], style=tabsStyle)
 
@@ -273,6 +311,26 @@ def on_soundUpload(contents, name, date):
        print("sound file size: %d, rate: %d" % (fileSize, rate))
        sound_validationMessage = "%s (%d bytes), valid sound: %s %s" % (name, fileSize, validSound, errorMessage)
        return sound_validationMessage
+
+#----------------------------------------------------------------------------------------------------
+@app.callback(Output('tierMapUploadTextArea', 'value'),
+              [Input('upload-tierMap-file', 'contents')],
+              [State('upload-tierMap-file', 'filename'),
+               State('upload-tierMap-file', 'last_modified')])
+def on_tierMapUpload(contents, name, date):
+    if name is None:
+        return("")
+    encodedString = contents.encode("utf8").split(b";base64,")[1]
+    decodedString = base64.b64decode(encodedString)
+    s = decodedString.decode('utf-8')
+    yaml_list = yaml.load(s)
+    filename = os.path.join(UPLOAD_DIRECTORY, name)
+    with open(filename, "w") as fp:
+       fp.write(s)
+       fp.close()
+       return(s)
+   
+    return("foo")
 
 #----------------------------------------------------------------------------------------------------
 # app.run_server()
