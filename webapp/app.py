@@ -181,6 +181,26 @@ def create_grammaticalTermsFileUploader():
     return uploader
 
 #----------------------------------------------------------------------------------------------------
+def create_associateEAFandSoundTab():
+    
+   style = {'border': '5px solid purple',
+            'border-radius': '5px',
+            'padding': '10px'}
+
+   button =  html.Button('Extract Sounds By Phrase', id='extractSoundsByPhraseButton')
+
+   textArea = dcc.Textarea(id="associateEAFAndSoundInfoTextArea",
+                           placeholder='eaf + soundFile',
+                           value="",
+                           style={'width': 600, 'height': 300})
+
+   children = [button, textArea]
+
+   div = html.Div(children=children, id='associateEAFandSoundDiv')
+
+   return div
+
+#----------------------------------------------------------------------------------------------------
 def create_masterDiv():
 
    style = {'border': '1px solid green',
@@ -219,11 +239,13 @@ def create_uploadsDiv():
                    children=[dcc.Tab(label='EAF', children=create_eafUploaderTab()),
                              dcc.Tab(label='Sound', children=create_soundFileUploaderTab()),
                              dcc.Tab(label='Tier Map', children=create_tierMapUploaderTab()),
-                             dcc.Tab(label='GrammaticalTerms', children=create_grammaticalTermsUploaderTab())
+                             dcc.Tab(label='GrammaticalTerms', children=create_grammaticalTermsUploaderTab()),
+                             dcc.Tab(label='EAF+Sound', children=create_associateEAFandSoundTab()),
+                             
                    ], style=tabsStyle)
 
    children = tabs;
-   div = html.Div(children=children, id='uploads-div', className="eight columns") # , style=style)
+   div = html.Div(children=children, id='uploads-div', className="twelve columns") # , style=style)
 
    return div
 
@@ -270,10 +292,12 @@ def parse_eaf_upload(contents, filename, date):
 #----------------------------------------------------------------------------------------------------
 app.layout = html.Div(
     children=[
-        create_masterDiv(),
+        #create_masterDiv(),
         create_uploadsDiv(),
         html.P(id="scratchPad", style={'display': 'hidden'}),
-    ],
+        html.P(id='eaf_filename_storage',   title="eaf",   style={'display': 'none'}),
+        html.P(id='sound_filename_storage', title="sound", style={'display': 'none'})
+        ],
     className="row",
     id='outerDiv',
     style={'margin':  '10px',
@@ -284,17 +308,17 @@ app.layout = html.Div(
         })
 
 #----------------------------------------------------------------------------------------------------
-@app.callback(Output('eafStatusLabel', 'children'),
-              [Input('upload-eaf-file', 'contents')],
-              [State('upload-eaf-file', 'filename'),
-               State('upload-eaf-file', 'last_modified')])
-def updateEafLabel(contents, name, date):
-   if name is None:
-       return "EAF: "
-   if name is not None:
-       print("on_eafUpload, name: %s" % name)
-       return "EAF: %s" % name
-
+# @app.callback(Output('eafStatusLabel', 'children'),
+#              [Input('upload-eaf-file', 'contents')],
+#              [State('upload-eaf-file', 'filename'),
+#               State('upload-eaf-file', 'last_modified')])
+#def updateEafLabel(contents, name, date):
+#   if name is None:
+#       return "EAF: "
+#   if name is not None:
+#       print("on_eafUpload, name: %s" % name)
+#       return "EAF: %s" % name
+#
 #----------------------------------------------------------------------------------------------------
 @app.callback(Output('eafUploadTextArea', 'value'),
               [Input('upload-eaf-file', 'contents')],
@@ -387,4 +411,32 @@ def on_grammaticalTermsUpload(contents, name, date):
     return("foo")
 
 #----------------------------------------------------------------------------------------------------
+@app.callback(
+    Output('associateEAFAndSoundInfoTextArea', 'title'),
+    [Input('extractSoundsByPhraseButton', 'n_clicks')])
+def update_output(n_clicks):
+    #return 'The input value was "{}" and the button has been clicked {} times'.format(
+    #    value,
+    #    n_clicks
+    return("click %d" % n_clicks)
+
+#----------------------------------------------------------------------------------------------------
+@app.callback(
+    Output('sound_filename_storage', 'title'),
+    [Input("soundFileUploadTextArea", 'value')])
+def update_output(value):
+    print("callback triggered by soundFileUploadTextArea change: %s" % value)
+    return(value)
+
+#----------------------------------------------------------------------------------------------------
+@app.callback(
+    Output('eaf_filename_storage', 'title'),
+    [Input("eafUploadTextArea", 'value')])
+def update_output(value):
+    print("callback triggered by ueafploadTextArea change: %s" % value)
+    return(value)
+
+#----------------------------------------------------------------------------------------------------
+
+
 # app.run_server()
