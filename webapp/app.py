@@ -182,21 +182,22 @@ def create_grammaticalTermsFileUploader():
 
 #----------------------------------------------------------------------------------------------------
 def create_associateEAFandSoundTab():
-    
+
    style = {'border': '5px solid purple',
             'border-radius': '5px',
             'padding': '10px'}
 
-   button =  html.Button('Extract Sounds By Phrase', id='extractSoundsByPhraseButton')
+   button =  html.Button('Extract Sounds By Phrase', id='extractSoundsByPhraseButton', style={"margin": "20px"})
+   button2 =  html.Button('Extract Sounds By Phrase', id='extractSoundsByPhraseButtonasd', style={"height": 0})
 
    textArea = dcc.Textarea(id="associateEAFAndSoundInfoTextArea",
                            placeholder='eaf + soundFile',
                            value="",
                            style={'width': 600, 'height': 300})
 
-   children = [button, textArea]
+   children = [html.Br(), html.Br(), button, html.Br(), html.Br(), textArea]
 
-   div = html.Div(children=children, id='associateEAFandSoundDiv')
+   div = html.Div(children=children, id='associateEAFandSoundDiv', style={'display': 'block'})
 
    return div
 
@@ -241,7 +242,7 @@ def create_uploadsDiv():
                              dcc.Tab(label='Tier Map', children=create_tierMapUploaderTab()),
                              dcc.Tab(label='GrammaticalTerms', children=create_grammaticalTermsUploaderTab()),
                              dcc.Tab(label='EAF+Sound', children=create_associateEAFandSoundTab()),
-                             
+
                    ], style=tabsStyle)
 
    children = tabs;
@@ -294,9 +295,8 @@ app.layout = html.Div(
     children=[
         #create_masterDiv(),
         create_uploadsDiv(),
-        html.P(id="scratchPad", style={'display': 'hidden'}),
-        html.P(id='eaf_filename_storage',   title="eaf",   style={'display': 'none'}),
-        html.P(id='sound_filename_storage', title="sound", style={'display': 'none'})
+        html.P(id='eaf_filename_hiddenStorage',   children="", style={'display': 'none'}),
+        html.P(id='sound_filename_hiddenStorage', children="", style={'display': 'none'})
         ],
     className="row",
     id='outerDiv',
@@ -335,7 +335,7 @@ def on_eafUpload(contents, name, date):
          print("eaf file size: %d" % fileSize)
          schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
          validXML = schema.is_valid(filename)
-         eaf_validationMessage = "%s (%d bytes), valid XML: %s" % (name, fileSize, validXML)
+         eaf_validationMessage = "%s: (%d bytes), valid XML: %s" % (name, fileSize, validXML)
          if(not validXML):
             try:
                schema.validate(filename)
@@ -367,7 +367,7 @@ def on_soundUpload(contents, name, date):
           validSound = False
           errorMessage = str(e)
        print("sound file size: %d, rate: %d" % (fileSize, rate))
-       sound_validationMessage = "%s (%d bytes), valid sound: %s %s" % (name, fileSize, validSound, errorMessage)
+       sound_validationMessage = "%s:  (%d bytes), valid sound: %s %s" % (name, fileSize, validSound, errorMessage)
        return sound_validationMessage
 
 #----------------------------------------------------------------------------------------------------
@@ -387,7 +387,7 @@ def on_tierMapUpload(contents, name, date):
        fp.write(s)
        fp.close()
        return(s)
-   
+
     return("foo")
 
 #----------------------------------------------------------------------------------------------------
@@ -407,22 +407,37 @@ def on_grammaticalTermsUpload(contents, name, date):
        fp.write(s)
        fp.close()
        return(s)
-   
+
     return("foo")
 
 #----------------------------------------------------------------------------------------------------
 @app.callback(
-    Output('associateEAFAndSoundInfoTextArea', 'title'),
-    [Input('extractSoundsByPhraseButton', 'n_clicks')])
-def update_output(n_clicks):
+    Output('associateEAFAndSoundInfoTextArea', 'value'),
+    [Input('extractSoundsByPhraseButton', 'n_clicks')],
+    [State('sound_filename_hiddenStorage', 'children'),
+     State('eaf_filename_hiddenStorage',   'children')])
+def update_output(n_clicks, soundFileName, eafFileName):
+    if n_clicks is None:
+        return("")
+    print("n_clicks: %d" % n_clicks)
+    if soundFileName is None:
+        return("")
+    if eafFileName is None:
+        return("")
+    soundFileName = soundFileName.split(":")[0]
+    eafFileName = eafFileName.split(":")[0]
+    eafFileFullPath = os.path.join(UPLOAD_DIRECTORY, eafFileName)
+    soundFileFullPath = os.path.join(UPLOAD_DIRECTORY, soundFileName)
+    print("soundFileName: %s" % soundFileName)
+    print("eafFileName: %s" % eafFileName)
     #return 'The input value was "{}" and the button has been clicked {} times'.format(
     #    value,
     #    n_clicks
-    return("click %d" % n_clicks)
+    return("extract sounds from %s as specified by %s" % (soundFileFullPath, eafFileFullPath))
 
 #----------------------------------------------------------------------------------------------------
 @app.callback(
-    Output('sound_filename_storage', 'title'),
+    Output('sound_filename_hiddenStorage', 'children'),
     [Input("soundFileUploadTextArea", 'value')])
 def update_output(value):
     print("callback triggered by soundFileUploadTextArea change: %s" % value)
@@ -430,7 +445,7 @@ def update_output(value):
 
 #----------------------------------------------------------------------------------------------------
 @app.callback(
-    Output('eaf_filename_storage', 'title'),
+    Output('eaf_filename_hiddenStorage', 'children'),
     [Input("eafUploadTextArea", 'value')])
 def update_output(value):
     print("callback triggered by ueafploadTextArea change: %s" % value)
