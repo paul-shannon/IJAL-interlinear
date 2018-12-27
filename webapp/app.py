@@ -398,7 +398,8 @@ def on_soundUpload(contents, name, date):
           validSound = False
           errorMessage = str(e)
        print("sound file size: %d, rate: %d" % (fileSize, rate))
-       sound_validationMessage = "%s:  (%d bytes), valid sound: %s %s" % (name, fileSize, validSound, errorMessage)
+       sound_validationMessage = "%s:  (%d bytes), valid sound: %s %s" % (filename, fileSize,
+                                                                          validSound, errorMessage)
        return sound_validationMessage
 
 #----------------------------------------------------------------------------------------------------
@@ -455,8 +456,8 @@ def update_output(n_clicks, soundFileName, eafFileName):
         return("")
     soundFileName = soundFileName
     eafFileName = eafFileName
-    eafFileFullPath = os.path.join(UPLOAD_DIRECTORY, eafFileName)
-    soundFileFullPath = os.path.join(UPLOAD_DIRECTORY, soundFileName)
+    eafFileFullPath = eafFileName # os.path.join(UPLOAD_DIRECTORY, eafFileName)
+    soundFileFullPath = soundFileName # os.path.join(UPLOAD_DIRECTORY, soundFileName)
     print("soundFileName: %s" % soundFileName)
     print("eafFileName: %s" % eafFileName)
     destinationDirectory = soundFileFullPath.replace(".wav", "")
@@ -528,7 +529,8 @@ def update_output(n_clicks, soundFileName, eafFileName, audioPhraseDirectory,
     print("--- create web page")
     print("        eaf: %s", eafFileName)
     print(" phrases in: %s", audioPhraseDirectory)
-    createWebPage(eafFileName, audioPhraseDirectory, grammaticalTermsFile, tierGuideFile)
+    html = createWebPage(eafFileName, audioPhraseDirectory, grammaticalTermsFile, tierGuideFile)
+    return(html)
 
 
 #----------------------------------------------------------------------------------------------------
