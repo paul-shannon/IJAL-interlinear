@@ -355,17 +355,18 @@ app.layout = html.Div(
               [State('upload-eaf-file', 'filename'),
                State('upload-eaf-file', 'last_modified')])
 def on_eafUpload(contents, name, date):
-    if name is not None:
-       print("on_eafUpload, name: %s" % name)
-       data = contents.encode("utf8").split(b";base64,")[1]
-       filename = os.path.join(UPLOAD_DIRECTORY, name)
-       with open(filename, "wb") as fp:
+    if name is None:
+        return("")
+    print("on_eafUpload, name: %s" % name)
+    data = contents.encode("utf8").split(b";base64,")[1]
+    filename = os.path.join(UPLOAD_DIRECTORY, name)
+    with open(filename, "wb") as fp:
          fp.write(base64.decodebytes(data))
          fileSize = os.path.getsize(filename)
          print("eaf file size: %d" % fileSize)
          schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
          validXML = schema.is_valid(filename)
-         eaf_validationMessage = "%s: (%d bytes), valid XML: %s" % (name, fileSize, validXML)
+         eaf_validationMessage = "%s: (%d bytes), valid XML: %s" % (filename, fileSize, validXML)
          if(not validXML):
             try:
                schema.validate(filename)
@@ -471,7 +472,7 @@ def update_output(n_clicks, soundFileName, eafFileName):
     Output('sound_filename_hiddenStorage', 'children'),
     [Input("soundFileUploadTextArea", 'value')])
 def update_output(value):
-    print("callback triggered by soundFileUploadTextArea change: %s" % value)
+    print("sound_filename_hiddenStorage assignment, callback triggered by soundFileUploadTextArea change: %s" % value)
     soundFileName = value.split(":")[0]
     return(soundFileName)
 
@@ -480,7 +481,7 @@ def update_output(value):
     Output('eaf_filename_hiddenStorage', 'children'),
     [Input("eafUploadTextArea", 'value')])
 def update_output(value):
-    print("callback triggered by eafploadTextArea change: %s" % value)
+    print("eaf_filename_hiddenStorage assignment, callback triggered by eafUploadTextArea change: %s" % value)
     eafFileName = value.split(":")[0]
     return(eafFileName)
 
