@@ -164,7 +164,10 @@ def create_grammaticalTermsUploaderTab():
                            value="",
                            style={'width': 600, 'height': 300})
 
+   button =  html.Button('No Grammatical Terms', id='noGrammaticalTermsButton', style={"margin": "20px"})
+
    children = [html.Br(),
+               button,
                html.Div([create_grammaticalTermsFileUploader()],
                         style={'display': 'inline-block'}),
                html.Br(),
@@ -194,7 +197,6 @@ def create_associateEAFandSoundTab():
             'padding': '10px'}
 
    button =  html.Button('Extract Sounds By Phrase', id='extractSoundsByPhraseButton', style={"margin": "20px"})
-   button2 =  html.Button('Extract Sounds By Phrase', id='extractSoundsByPhraseButtonasd', style={"height": 0})
 
    textArea = dcc.Textarea(id="associateEAFAndSoundInfoTextArea",
                            placeholder='eaf + soundFile',
@@ -374,7 +376,7 @@ def on_eafUpload(contents, name, date):
                schema.validate(filename)
             except xmlschema.XMLSchemaValidationError as e:
                failureReason = e.reason
-               eaf_validationMessage = "%s.  error: %s" % (validationMessage, failureReason)
+               eaf_validationMessage = "%s failure.  error: %s" % (filename, failureReason)
          return eaf_validationMessage
 
 #----------------------------------------------------------------------------------------------------
@@ -531,6 +533,8 @@ def update_output(n_clicks, soundFileName, eafFileName, audioPhraseDirectory,
     print("--- create web page")
     print("        eaf: %s", eafFileName)
     print(" phrases in: %s", audioPhraseDirectory)
+    if(grammaticalTermsFile == ""):
+        grammaticalTermsFile = None
     html = createWebPage(eafFileName, audioPhraseDirectory, grammaticalTermsFile, tierGuideFile)
     absolutePath = os.path.abspath("demo.html")
     file = open("demo.html", "w")
