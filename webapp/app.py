@@ -9,14 +9,19 @@ import pandas as pd
 import dash_table
 import yaml
 import io
-
+#----------------------------------------------------------------------------------------------------
+import sys
+sys.path.append("../ijal_interlinear")
+from audioExtractor import *
+from text import *
+#----------------------------------------------------------------------------------------------------
 # schema = xmlschema.XMLSchema('http://www.mpi.nl/tools/elan/EAFv3.0.xsd')
 # schema.is_valid('../ijal_interlinear/testData/monkeyAndThunder/AYA1_MonkeyandThunder.eaf')
 # schema.validate('../ijal_interlinear/testData/harryMosesDaylight/daylight_1_4.eaf')
 #   xmlschema.validators.exceptions.XMLSchemaValidationError: failed validating <Element 'ANNOTATION_DOCUMENT' at
 #        0x10e6e5688> with XsdKeyref(name='tierNameRef', refer='tierNameKey'):
 #   Reason: Key 'tierNameRef' with value ('todo',) not found for identity constraint of element 'ANNOTATION_DOCUMENT'.
-
+#----------------------------------------------------------------------------------------------------
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
@@ -202,6 +207,26 @@ def create_associateEAFandSoundTab():
    return div
 
 #----------------------------------------------------------------------------------------------------
+def create_webPageCreationTab():
+
+   style = {'border': '5px solid purple',
+            'border-radius': '5px',
+            'padding': '10px'}
+
+   button =  html.Button('Create Web Page', id='createWebPageButton', style={"margin": "20px"})
+
+   textArea = dcc.Textarea(id="createWebPageInfoTextArea",
+                           placeholder='progress info will appear here',
+                           value="",
+                           style={'width': 600, 'height': 300})
+
+   children = [html.Br(), html.Br(), button, html.Br(), html.Br(), textArea]
+
+   div = html.Div(children=children, id='createWebPageDiv', style={'display': 'block'})
+
+   return div
+
+#----------------------------------------------------------------------------------------------------
 def create_masterDiv():
 
    style = {'border': '1px solid green',
@@ -242,6 +267,8 @@ def create_uploadsDiv():
                              dcc.Tab(label='Tier Map', children=create_tierMapUploaderTab()),
                              dcc.Tab(label='GrammaticalTerms', children=create_grammaticalTermsUploaderTab()),
                              dcc.Tab(label='EAF+Sound', children=create_associateEAFandSoundTab()),
+                             dcc.Tab(label='Create Web Page', children=create_webPageCreationTab()),
+
 
                    ], style=tabsStyle)
 
@@ -295,8 +322,11 @@ app.layout = html.Div(
     children=[
         #create_masterDiv(),
         create_uploadsDiv(),
-        html.P(id='eaf_filename_hiddenStorage',   children="", style={'display': 'none'}),
-        html.P(id='sound_filename_hiddenStorage', children="", style={'display': 'none'})
+        html.P(id='eaf_filename_hiddenStorage',         children="", style={'display': 'none'}),
+        html.P(id='sound_filename_hiddenStorage',       children="", style={'display': 'none'}),
+        html.P(id='audioPhraseDirectory_hiddenStorage', children="", style={'display': 'none'}),
+        html.P(id='grammaticalTerms_filename_hiddenStorage', children="", style={'display': 'none'}),
+        html.P(id='tierGuide_filename_hiddenStorage',        children="", style={'display': 'none'}),
         ],
     className="row",
     id='outerDiv',
@@ -386,9 +416,8 @@ def on_tierMapUpload(contents, name, date):
     with open(filename, "w") as fp:
        fp.write(s)
        fp.close()
-       return(s)
 
-    return("foo")
+    return("%s: %s" % (filename, s))
 
 #----------------------------------------------------------------------------------------------------
 @app.callback(Output('grammaticalTermsUploadTextArea', 'value'),
@@ -406,9 +435,8 @@ def on_grammaticalTermsUpload(contents, name, date):
     with open(filename, "w") as fp:
        fp.write(s)
        fp.close()
-       return(s)
 
-    return("foo")
+    return("%s: %s" % (filename, s))
 
 #----------------------------------------------------------------------------------------------------
 @app.callback(
@@ -424,16 +452,19 @@ def update_output(n_clicks, soundFileName, eafFileName):
         return("")
     if eafFileName is None:
         return("")
-    soundFileName = soundFileName.split(":")[0]
-    eafFileName = eafFileName.split(":")[0]
+    soundFileName = soundFileName
+    eafFileName = eafFileName
     eafFileFullPath = os.path.join(UPLOAD_DIRECTORY, eafFileName)
     soundFileFullPath = os.path.join(UPLOAD_DIRECTORY, soundFileName)
     print("soundFileName: %s" % soundFileName)
     print("eafFileName: %s" % eafFileName)
+    destinationDirectory = soundFileFullPath.replace(".wav", "")
+    phraseFileCount = extractPhrases(soundFileFullPath, eafFileFullPath, destinationDirectory)
+    print("after extractPhrases")
     #return 'The input value was "{}" and the button has been clicked {} times'.format(
     #    value,
     #    n_clicks
-    return("extract sounds from %s as specified by %s" % (soundFileFullPath, eafFileFullPath))
+    return("%s: %d phrases" % (destinationDirectory, phraseFileCount))
 
 #----------------------------------------------------------------------------------------------------
 @app.callback(
@@ -441,17 +472,92 @@ def update_output(n_clicks, soundFileName, eafFileName):
     [Input("soundFileUploadTextArea", 'value')])
 def update_output(value):
     print("callback triggered by soundFileUploadTextArea change: %s" % value)
-    return(value)
+    soundFileName = value.split(":")[0]
+    return(soundFileName)
 
 #----------------------------------------------------------------------------------------------------
 @app.callback(
     Output('eaf_filename_hiddenStorage', 'children'),
     [Input("eafUploadTextArea", 'value')])
 def update_output(value):
-    print("callback triggered by ueafploadTextArea change: %s" % value)
-    return(value)
+    print("callback triggered by eafploadTextArea change: %s" % value)
+    eafFileName = value.split(":")[0]
+    return(eafFileName)
+
+#----------------------------------------------------------------------------------------------------
+@app.callback(
+    Output('audioPhraseDirectory_hiddenStorage', 'children'),
+    [Input('associateEAFAndSoundInfoTextArea', 'value')])
+def update_output(value):
+    print("callback triggered by assocateEAFAndSoundTextArea change: %s" % value)
+    phraseDirectory = value.split(":")[0]
+    return(phraseDirectory)
+
+#----------------------------------------------------------------------------------------------------
+@app.callback(
+    Output('grammaticalTerms_filename_hiddenStorage', 'children'),
+    [Input('grammaticalTermsUploadTextArea', 'value')])
+def update_output(value):
+    print("callback triggered by grammaticalTermsUploadTextArea change: %s" % value)
+    grammaticalTermsFile  = value.split(":")[0]
+    return(grammaticalTermsFile)
+
+#----------------------------------------------------------------------------------------------------
+@app.callback(
+    Output('tierGuide_filename_hiddenStorage', 'children'),
+    [Input('tierMapUploadTextArea', 'value')])
+def update_output(value):
+    print("callback triggered by grammaticalTermsUploadTextArea change: %s" % value)
+    tierGuideFile  = value.split(":")[0]
+    return(tierGuideFile)
+
+#----------------------------------------------------------------------------------------------------
+@app.callback(
+    Output('createWebPageInfoTextArea', 'value'),
+    [Input('createWebPageButton', 'n_clicks')],
+    [State('sound_filename_hiddenStorage', 'children'),
+     State('eaf_filename_hiddenStorage',   'children'),
+     State('audioPhraseDirectory_hiddenStorage', 'children'),
+     State('grammaticalTerms_filename_hiddenStorage', 'children'),
+     State('tierGuide_filename_hiddenStorage', 'children')])
+def update_output(n_clicks, soundFileName, eafFileName, audioPhraseDirectory,
+                  grammaticalTermsFile, tierGuideFile):
+    if n_clicks is None:
+        return("")
+    print("--- create web page")
+    print("        eaf: %s", eafFileName)
+    print(" phrases in: %s", audioPhraseDirectory)
+    createWebPage(eafFileName, audioPhraseDirectory, grammaticalTermsFile, tierGuideFile)
+
+
+#----------------------------------------------------------------------------------------------------
+def extractPhrases(soundFileFullPath, eafFileFullPath, destinationDirectory):
+
+    print("------- entering extractPhrases")
+    print("soundFileFullPath: %s" % soundFileFullPath)
+    if not os.path.exists(destinationDirectory):
+        os.makedirs(destinationDirectory)
+    ea = AudioExtractor(soundFileFullPath, eafFileFullPath, destinationDirectory)
+    assert(ea.validInputs)
+    ea.extract(quiet=True)
+    phraseFileCount = len(os.listdir(destinationDirectory))
+    return(phraseFileCount)
+
+#----------------------------------------------------------------------------------------------------
+def createWebPage(eafFileName, audioPhraseDirectory, grammaticalTermsFileName, tierGuideFileName):
+
+    print("-------- entering createWebPage")
+    print("eafFileName: %s" % eafFileName)
+    print("audioPhraseDirectory: %s" % audioPhraseDirectory)
+    print("grammaticalTermsFile: %s" % grammaticalTermsFileName)
+    print("tierGuideFile: %s" % tierGuideFileName)
+    text = Text(eafFileName,
+                audioPhraseDirectory,
+                grammaticalTermsFileName,
+                tierGuideFileName)
+
+    return(text.toHTML())
 
 #----------------------------------------------------------------------------------------------------
 
 
-# app.run_server()
