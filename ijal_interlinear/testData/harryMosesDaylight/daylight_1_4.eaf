@@ -38,7 +38,7 @@
         </ANNOTATION>
 
     </TIER>
-    <TIER LINGUISTIC_TYPE_REF="phonemic" PARENT_REF="todo" TIER_ID="phonemicLushootseed">
+    <TIER LINGUISTIC_TYPE_REF="phonemic" PARENT_REF="lushootseedSpeech" TIER_ID="phonemicLushootseed">
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a5" ANNOTATION_REF="a1">
                 <ANNOTATION_VALUE>ʔal	kʷi	tu-	ʔal	kʷi	tu-haʔkʷ	gʷәl	xʷiʔ	gʷә-tu-s-lәx̌-il</ANNOTATION_VALUE>
@@ -65,7 +65,7 @@
 
     </TIER>
 
-    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="speech" TIER_ID="phonemicTranslation">
+    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="lushootseedSpeech" TIER_ID="phonemicTranslation">
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a9" ANNOTATION_REF="a5">
                 <ANNOTATION_VALUE>in	remote	past	in	remote	past-long-ago	and	not	daylight</ANNOTATION_VALUE>
@@ -93,7 +93,7 @@
      </TIER>
 
 
-    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="speech" TIER_ID="englishGloss">
+    <TIER DEFAULT_LOCALE="tr" LINGUISTIC_TYPE_REF="translation" PARENT_REF="lushootseedSpeech" TIER_ID="englishGloss">
         <ANNOTATION>
             <REF_ANNOTATION ANNOTATION_ID="a13" ANNOTATION_REF="a1">
                 <ANNOTATION_VALUE>In the distant past, there was no daylight.</ANNOTATION_VALUE>
@@ -113,7 +113,7 @@
         </ANNOTATION>
 
         <ANNOTATION>
-            <REF_ANNOTATION ANNOTATION_ID="a15" ANNOTATION_REF="a4">
+            <REF_ANNOTATION ANNOTATION_ID="a16" ANNOTATION_REF="a4">
                 <ANNOTATION_VALUE>Daylight is up there in the upriver country but how can we manage to get it?</ANNOTATION_VALUE>
             </REF_ANNOTATION>
         </ANNOTATION>
