@@ -9,6 +9,7 @@ import pandas as pd
 import dash_table
 import yaml
 import io
+import webbrowser
 #----------------------------------------------------------------------------------------------------
 import sys
 sys.path.append("../ijal_interlinear")
@@ -218,8 +219,9 @@ def create_webPageCreationTab():
    textArea = dcc.Textarea(id="createWebPageInfoTextArea",
                            placeholder='progress info will appear here',
                            value="",
-                           style={'width': 600, 'height': 300})
+                           style={'width': 60, 'height': 30})
 
+   webPageIframe = html.Iframe(id="storyIframe", src="<h3>the story goes here</h3>")
    children = [html.Br(), html.Br(), button, html.Br(), html.Br(), textArea]
 
    div = html.Div(children=children, id='createWebPageDiv', style={'display': 'block'})
@@ -530,7 +532,13 @@ def update_output(n_clicks, soundFileName, eafFileName, audioPhraseDirectory,
     print("        eaf: %s", eafFileName)
     print(" phrases in: %s", audioPhraseDirectory)
     html = createWebPage(eafFileName, audioPhraseDirectory, grammaticalTermsFile, tierGuideFile)
-    return(html)
+    absolutePath = os.path.abspath("demo.html")
+    file = open("demo.html", "w")
+    file.write(html)
+    file.close()
+    url = 'file:///%s' % absolutePath
+    webbrowser.open(url, new=2)
+    return("wrote file")
 
 
 #----------------------------------------------------------------------------------------------------
