@@ -41,7 +41,7 @@ class Text:
    #  tmpDoc = etree.parse(self.xmlFilename)
    #  tierIDs = [tier.attrib["TIER_ID"] for tier in tmpDoc.findall("TIER")]
    #  return(tierIDs)
-   
+
    def getTierSummary(self):
      tmpDoc = etree.parse(self.xmlFilename)
      tierIDs = [tier.attrib["TIER_ID"] for tier in tmpDoc.findall("TIER")]
@@ -63,7 +63,7 @@ class Text:
 
 
      return(tierIDs)
-   
+
    def validInputs(self):
      assert(os.path.isfile(self.xmlFilename))
      assert(os.path.isfile(self.tierGuideFile))
@@ -100,8 +100,8 @@ class Text:
      with htmlDoc.tag('html', lang="en"):
         with htmlDoc.tag('head'):
             htmlDoc.asis('<meta charset="UTF-8">')
-            htmlDoc.asis('<link rel="stylesheet" href="ijal.css">')
-            htmlDoc.asis('<script src="ijalUtils.js"></script>')
+            htmlDoc.asis('<link rel="stylesheet" href="http://pshannon.net/ijal/ijal.css">')
+            htmlDoc.asis('<script src="http://pshannon.net/ijal/ijalUtils.js"></script>')
             with htmlDoc.tag('body'):
                 for i in lineNumbers:
                     if(not self.quiet):
